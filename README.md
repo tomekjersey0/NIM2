@@ -18,7 +18,9 @@ so my goal is to eventually make it possible to easily download this game as an 
 and play with someone else on the internet. Will it be player hosted? Most likely, as long as I figure out a good way to do that.
 (No ones gonna cheat in Nim of all things, anyway. )
 
-#### Advice for debugging
+<hr>
+
+### Advice for debugging
 
 If you wanna debug, you're gonna need gdb for that, so get MSYS2, update it to the max with **pacman -Syu**,
 and install gdb. If that's tricky to do off the top of your head, look it up with AI or the internet.
@@ -31,7 +33,7 @@ MinGW folders, and have MinGW in your PATH.
 To Debug, press F5 in vscode, and everything should work automatically. If I (or you, which could probably be me), find any issues 
 with the process, I'll add the workarounds here
 
-#### Advice for running the program
+### Advice for running the program
 
 Do I look like some 'running c++ files guru' to you? Come on mate, either install make with chocolatey and run 'make' in this directory, or go learn a thing or to about the harsh realities of learning things using your own time and effort in this world. Piss off!
 * 'make build' to build...
