@@ -9,7 +9,7 @@ Nim, the coolest game ever.
 
 So far, not much, but I'll add them to this list as the project goes on
 * Test windows, with selectable (which highlight) windows that can be switched between
-* Super easy window addition system
+* Super easy window management system
 
 ### What are some of the planned features or possible goal / scope for this project?
 
