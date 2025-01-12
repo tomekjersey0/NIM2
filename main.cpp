@@ -10,12 +10,53 @@ class WindowClass {
         int cur_w, cur_h, x, y, std_unit;
         WINDOW *win;
         void (*callback)(WINDOW * win); // Proper function pointer declaration
-        std::vector<std::vector<int>> WindowLayout;
 
 
     public:
+        WindowClass(const int _std_unit, int height, int width, int _y, int _x,  void (*_callback)(WINDOW * win) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true) : 
+            std_unit(_std_unit),
+            y(_y),
+            x(_x),
+            has_border(has_border),
+            isShowing(isShowing),
+            isSelectable(isSelectable),
+            callback(_callback) // Direct initialization
+        {
+            cur_h = height * std_unit;
+            cur_w = width * std_unit * 2;
+            y = _y * std_unit;
+            x = _x * std_unit * 2;
+            win = newwin(cur_h, cur_w, y, x);
+        }  
+
         WINDOW * getWindow() {
             return win;
+        }
+
+        void setSize(int height_stdunit, int width_stdunit) {
+            cur_h = height_stdunit * std_unit;
+            cur_w = width_stdunit * std_unit;
+        }
+
+        void setPos (int x_stdunit, int y_stdunit) {
+            x = x_stdunit * std_unit;
+            y = y_stdunit * std_unit;
+        }
+
+        int getHeight() {
+            return cur_h;
+        }        
+
+        int getWidth() {
+            return cur_w;
+        }
+
+        int getX() {
+            return x;
+        }
+
+        int getY() {
+            return y;
         }
         
         bool IsShowing() {
@@ -34,20 +75,6 @@ class WindowClass {
             isSelectable = set;
         }
 
-        WindowClass(const int std_unit, int height, int width, int y, int x,  void (*_callback)(WINDOW * win) = nullptr,  bool isSelectable = true, bool has_border = true, bool isShowing = true) : 
-            std_unit(std_unit),
-            has_border(has_border),
-            isShowing(isShowing),
-            isSelectable(isSelectable),
-            callback(_callback) // Direct initialization
-        {
-            cur_h = height * std_unit;
-            cur_w = width * std_unit * 2;
-            y = y * std_unit;
-            x= x * std_unit * 2;
-            win = newwin(cur_h, cur_w, y, x);
-        }
-
         void Update() {
             if (isShowing) {
                 if (callback) {
@@ -62,7 +89,6 @@ class WindowClass {
             }
         }
 };
-
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
 
@@ -114,7 +140,7 @@ void StartGame() {
     bool selectedFound = false;
     for (int i = 0; i < WindowLayout.size(); i++) {
         for (int j = 0; j < WindowLayout[i].size(); j++) {
-            if (Windows.at(WindowLayout[i][j]).IsSelectable()) {
+            if (Windows[WindowLayout[i][j]].IsSelectable()) {
                 selected = WindowLayout[i][j];
                 selectedFound = true;
                 break;
@@ -151,7 +177,7 @@ void StartGame() {
         for (int i = 0; i < WindowLayout.size(); i++) {
             std::vector<int> Row;
             for (int j = 0; j < WindowLayout[i].size(); j++) {
-                if (Windows.at(WindowLayout[i][j]).IsSelectable()) {
+                if (Windows[WindowLayout[i][j]].IsSelectable()) {
                     Row.push_back(WindowLayout[i][j]);
                 }
             }
@@ -214,10 +240,6 @@ void StartGame() {
                     cur_col = WindowLayoutC[cur_row].size() - 1;
                 }
                 break;
-
-            default:
-                gameOn = false;
-                continue;
         }
 
         // Update selected
@@ -241,6 +263,38 @@ void TimedErrorExit(std::string errorMessage, int countdownTime) {
     }
 }
 
+void SetTerminalSize(std::vector<WindowClass> Windows, std::vector<std::vector<int>> WindowLayout) {
+    // * works I guess??
+    // Get max height
+    int maxHeight = 0;
+    for (int i = 0; i < WindowLayout.size(); i++) {
+        int tallestInRow = 0;
+        for (int j = 0; j < WindowLayout[i].size(); j++) {
+            int windowHeight = Windows[WindowLayout[i][j]].getHeight();
+            int windowPosition = Windows[WindowLayout[i][j]].getY();
+            if (windowHeight > tallestInRow && Windows[WindowLayout[i][j]].IsShowing()) {
+                tallestInRow = windowHeight;
+            }
+        }
+        maxHeight += tallestInRow;
+    }
+    // Get max width
+    int maxWidth = 0;
+    for (int i = 0; i < WindowLayout.size(); i++) {
+        int rowWidth = 0;
+        for (int j = 0; j < WindowLayout[i].size(); j++) {
+            if (Windows[WindowLayout[i][j]].IsShowing()) {
+                rowWidth += Windows[WindowLayout[i][j]].getWidth();
+            }
+        }
+        if (rowWidth > maxWidth) {
+            maxWidth = rowWidth;
+        }
+    }
+
+    resize_term(maxHeight, maxWidth);
+}
+
 int main() {
     initscr();
     start_color();
@@ -260,13 +314,11 @@ int main() {
     }
 
     init_color(COLOR_WHITE, 700, 700, 700);
-   // init_color(COLOR_CYAN, 1000, 1000, 1000);
+    // * Makes the selected window color be a brighter white
+    // init_color(COLOR_CYAN, 1000, 1000, 1000);
 
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
-
-    // Initialize the windows
-    resize_term(60, 120);
 
     // Input layout data based on the windows defined immediately later
     WindowLayout = {
@@ -275,21 +327,25 @@ int main() {
         {3}
     };
 
-    const int std_unit = 5;
-    //                          --> 1, 4
-    WindowClass Intro = WindowClass(std_unit, 1, 4, 0, 0, IntroMethod, false);
-    WindowClass Game = WindowClass(std_unit, 2, 3, 1, 0, GameMethod);
-    WindowClass Selection = WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod);
-    WindowClass Score = WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod);
+    // Just makes it so that after resizing to the right size, everything renders just fine. 
+    // Not sure why or how this works, but it does, so that's that.
+    resize_term(1000, 1000);
 
-    Windows.push_back(Intro);
-    Windows.push_back(Game);
-    Windows.push_back(Selection);
-    Windows.push_back(Score);
+    const int std_unit = 10;
+    //                        2, 3 --> 1, 4                        // Selectable, Showing, Border
+    Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, IntroMethod));
+    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod, false, false));
+    Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod));
+    Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod));
+
+    SetTerminalSize(Windows, WindowLayout);
 
     StartGame();
 
     getch();
+    for (int i = 0; i < Windows.size(); i++) {
+        delwin(Windows[i].getWindow());
+    }
     endwin();
     return 0;
 }
