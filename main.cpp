@@ -2,12 +2,16 @@
 #include <iostream>
 #include <vector>
 
+void TimedErrorExit(std::string message, int countdownTime);
+
 class WindowClass {
     private:
-        bool has_border, isShowing;
-        int cur_w, cur_h, x, y;
+        bool has_border, isShowing, isSelectable;
+        int cur_w, cur_h, x, y, std_unit;
         WINDOW *win;
         void (*callback)(WINDOW * win); // Proper function pointer declaration
+        std::vector<std::vector<int>> WindowLayout;
+
 
     public:
         WINDOW * getWindow() {
@@ -22,15 +26,25 @@ class WindowClass {
             isShowing = set;
         }
 
-        WindowClass(int height, int width, int y, int x, bool has_border, bool isShowing, void (*_callback)(WINDOW * win) = nullptr) : 
-            cur_h(height),
-            cur_w(width),
-            y(y),
-            x(x),
+        bool IsSelectable() {
+            return isSelectable;
+        }
+
+        void IsSelectable (bool set) {
+            isSelectable = set;
+        }
+
+        WindowClass(const int std_unit, int height, int width, int y, int x,  void (*_callback)(WINDOW * win) = nullptr,  bool isSelectable = true, bool has_border = true, bool isShowing = true) : 
+            std_unit(std_unit),
             has_border(has_border),
-            isShowing(isShowing),            
+            isShowing(isShowing),
+            isSelectable(isSelectable),
             callback(_callback) // Direct initialization
         {
+            cur_h = height * std_unit;
+            cur_w = width * std_unit * 2;
+            y = y * std_unit;
+            x= x * std_unit * 2;
             win = newwin(cur_h, cur_w, y, x);
         }
 
@@ -67,19 +81,23 @@ void GameMethod(WINDOW * win) {
     mvwprintw(win, 1, 1, "Game is now showing!");
 }
 
-void TestMethod(WINDOW * win) {
-    mvwprintw(win, 1, 1, "Testing testing...");
+void SelectionMethod(WINDOW * win) {
+    mvwprintw(win, 1, 1, "Choose your move:");
 }
 
-void UpdateSelected(int& selected, int row, int col) {
+void ScoreMethod(WINDOW * win) {
+    mvwprintw(win, 1, 1, "Score shown here...");
+}
+
+void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int>> WindowLayoutC) {
     // Ensure row and col are within bounds
-    if (row < 0 || row >= WindowLayout.size() || col < 0 || col >= WindowLayout[row].size()) {
+    if (row < 0 || row >= WindowLayoutC.size() || col < 0 || col >= WindowLayoutC[row].size()) {
         std::cerr << "Invalid row or column in UpdateSelected: row=" << row << ", col=" << col << std::endl;
         return;
     }
 
     // Update selected
-    selected = WindowLayout[row][col];
+    selected = WindowLayoutC[row][col];
 }
 
 void StartGame() {
@@ -89,8 +107,27 @@ void StartGame() {
     }
 
     bool gameOn = true;
-    int selected = WindowLayout[0][0]; // Default to the first window
-    int cur_row = 0, cur_col = 0;
+    int selected; // Default to the first selectable window
+    int cur_row, cur_col; // Set based on selected
+
+    // Determine selected on first available selectable window
+    bool selectedFound = false;
+    for (int i = 0; i < WindowLayout.size(); i++) {
+        for (int j = 0; j < WindowLayout[i].size(); j++) {
+            if (Windows.at(WindowLayout[i][j]).IsSelectable()) {
+                selected = WindowLayout[i][j];
+                selectedFound = true;
+                break;
+            }
+        }
+        if (selectedFound) break;
+    }
+    // Exit if none of the windows are selectable
+    if (!selectedFound) {
+        TimedErrorExit("Error: No windows are selectable. Closing. ", 3);
+        gameOn = false;
+        return;
+    }
 
     while (gameOn) {
         // Update all windows except the currently selected one
@@ -107,6 +144,34 @@ void StartGame() {
             wattroff(Windows[selected].getWindow(), COLOR_PAIR(2));
         }
 
+        // Prepare WindowLayout Copy, adding only selectable windows
+        std::vector<std::vector<int>> WindowLayoutC;
+
+        // Update Copy based on selected states of Windows
+        for (int i = 0; i < WindowLayout.size(); i++) {
+            std::vector<int> Row;
+            for (int j = 0; j < WindowLayout[i].size(); j++) {
+                if (Windows.at(WindowLayout[i][j]).IsSelectable()) {
+                    Row.push_back(WindowLayout[i][j]);
+                }
+            }
+            if (!Row.empty()) WindowLayoutC.push_back(Row);
+        }
+
+        bool foundRowCol = false;
+        // Get row and column of currently selected window
+        for (int i = 0; i < WindowLayoutC.size(); i++) {
+            for (int j = 0; j < WindowLayoutC[i].size(); j++) {
+                if (WindowLayoutC[i][j] == selected) {
+                    cur_row = i;
+                    cur_col = j;
+                    foundRowCol = true;
+                    break;
+                }
+            }
+            if (foundRowCol) break;
+        }
+        
         // Handle user input
         int c = getch();
         switch (c) {
@@ -114,12 +179,11 @@ void StartGame() {
                 if (cur_col > 0) {
                     cur_col--;
                 } else {
-                    cur_col = WindowLayout[cur_row].size() - 1; // Wrap to the last column
+                    cur_col = WindowLayoutC[cur_row].size() - 1; // Wrap to the last column
                 }
                 break;
-
             case KEY_RIGHT:
-                if (cur_col < WindowLayout[cur_row].size() - 1) {
+                if (cur_col < WindowLayoutC[cur_row].size() - 1) {
                     cur_col++;
                 } else {
                     cur_col = 0; // Wrap to the first column
@@ -130,25 +194,24 @@ void StartGame() {
                 if (cur_row > 0) {
                     cur_row--;
                 } else {
-                    cur_row = WindowLayout.size() - 1; // Wrap to the last row
+                    cur_row = WindowLayoutC.size() - 1; // Wrap to the last row
                 }
 
                 // Adjust column index if the new row has fewer columns
-                if (cur_col >= WindowLayout[cur_row].size()) {
-                    cur_col = WindowLayout[cur_row].size() - 1;
+                if (cur_col >= WindowLayoutC[cur_row].size()) {
+                    cur_col = WindowLayoutC[cur_row].size() - 1;
                 }
                 break;
-
             case KEY_DOWN:
-                if (cur_row < WindowLayout.size() - 1) {
+                if (cur_row < WindowLayoutC.size() - 1) {
                     cur_row++;
                 } else {
                     cur_row = 0; // Wrap to the first row
                 }
 
                 // Adjust column index if the new row has fewer columns
-                if (cur_col >= WindowLayout[cur_row].size()) {
-                    cur_col = WindowLayout[cur_row].size() - 1;
+                if (cur_col >= WindowLayoutC[cur_row].size()) {
+                    cur_col = WindowLayoutC[cur_row].size() - 1;
                 }
                 break;
 
@@ -158,7 +221,7 @@ void StartGame() {
         }
 
         // Update selected
-        UpdateSelected(selected, cur_row, cur_col);
+        UpdateSelected(selected, cur_row, cur_col, WindowLayoutC);
     }
 }
 
@@ -182,6 +245,7 @@ int main() {
     initscr();
     start_color();
     cbreak();
+    noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
     
@@ -202,27 +266,26 @@ int main() {
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
 
     // Initialize the windows
-    resize_term(80, 80);
+    resize_term(60, 120);
 
-
-    WindowClass Intro = WindowClass(10, 30, 0, 0, true, true, IntroMethod);
-    WindowClass Game = WindowClass(13, 26, 10, 0, true, true, GameMethod);
-    WindowClass Test = WindowClass(13, 14, 10, 26, true, true);
-    WindowClass Test2 = WindowClass(10, 15, 0, 30, true, true);
-    WindowClass Test3 = WindowClass(10, 12, 0, 45, true, true);
-
-
+    // Input layout data based on the windows defined immediately later
     WindowLayout = {
-        {0, 3, 4},
-        {1, 2}
+        {0},
+        {1, 2},
+        {3}
     };
+
+    const int std_unit = 5;
+    //                          --> 1, 4
+    WindowClass Intro = WindowClass(std_unit, 1, 4, 0, 0, IntroMethod, false);
+    WindowClass Game = WindowClass(std_unit, 2, 3, 1, 0, GameMethod);
+    WindowClass Selection = WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod);
+    WindowClass Score = WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod);
 
     Windows.push_back(Intro);
     Windows.push_back(Game);
-    Windows.push_back(Test);
-    Windows.push_back(Test2);
-    Windows.push_back(Test3);
-
+    Windows.push_back(Selection);
+    Windows.push_back(Score);
 
     StartGame();
 
