@@ -22,7 +22,7 @@ class WindowClass {
             isShowing = set;
         }
 
-        WindowClass(int height, int width, int y, int x, bool has_border, bool isShowing, void (*_callback)(WINDOW * win)) : 
+        WindowClass(int height, int width, int y, int x, bool has_border, bool isShowing, void (*_callback)(WINDOW * win) = nullptr) : 
             cur_h(height),
             cur_w(width),
             y(y),
@@ -36,7 +36,9 @@ class WindowClass {
 
         void Update() {
             if (isShowing) {
-                callback(win); // Call the callback if the window is showing
+                if (callback) {
+                    callback(win); // Call the callback if the window is showing
+                }
 
                 if (has_border) {
                     box(win, 0, 0); // Draw border if needed
@@ -69,129 +71,94 @@ void TestMethod(WINDOW * win) {
     mvwprintw(win, 1, 1, "Testing testing...");
 }
 
-void UpdateSelected(int& selected, int row, int col, int& prevSelected) {
-    // Get previous selected coords
-    int prev_row = -1, prev_col = -1;
-    bool prevFound = false;
-    for (int i = 0; i < WindowLayout.size(); i++) {
-        for (int j = 0; j < WindowLayout[i].size(); j++) {
-            if (WindowLayout[i][j] == prevSelected) {
-                prev_row = i;
-                prev_col = j;
-                prevFound = true;
-                break;
-            }
-        }
-        if (prevFound) break;
-    }
-
-    // Normal case, directly inline columns
-    if (col < WindowLayout[row].size()) {
-        prevSelected = selected;  // Update prevSelected
-        selected = WindowLayout[row][col];
+void UpdateSelected(int& selected, int row, int col) {
+    // Ensure row and col are within bounds
+    if (row < 0 || row >= WindowLayout.size() || col < 0 || col >= WindowLayout[row].size()) {
+        std::cerr << "Invalid row or column in UpdateSelected: row=" << row << ", col=" << col << std::endl;
         return;
     }
 
-    // Clarifying check, column not directly inline
-    if (col >= WindowLayout[row].size()) {
-        int temp = selected;
-        // If moving back to the previous row, go to the same window
-        if (row == prev_row) {
-            selected = prevSelected;
-            prevSelected = temp;
-        } else {
-            selected = WindowLayout[row].back();  // Move to the last item in the current row
-            prevSelected = temp;
-        }
-        return;    
-    }
+    // Update selected
+    selected = WindowLayout[row][col];
 }
 
 void StartGame() {
+    if (WindowLayout.empty() || Windows.empty()) {
+        std::cerr << "Error: Window layout or windows list is empty." << std::endl;
+        return;
+    }
+
     bool gameOn = true;
-    int selected = 0;
-    int prevSelected = -1;
-    int cur_col, cur_row;
-
-    bool foundSelected = false;
-    for (int i = 0; i < WindowLayout.size(); i++) {
-        for (int j = 0; j < WindowLayout.at(i).size(); j++) {
-            if (WindowLayout[i][j] == selected) {
-                cur_col = j;
-                cur_row = i;
-                foundSelected = true;
-                break;
-            }
-        }
-        if (foundSelected) break;
-    }
-
-    // Ensure that Windows is not empty before proceeding
-    if (Windows.empty()) {
-        std::cerr << "Error: No windows available." << std::endl;
-        return;  // Early return if no windows to manage
-    }
+    int selected = WindowLayout[0][0]; // Default to the first window
+    int cur_row = 0, cur_col = 0;
 
     while (gameOn) {
+        // Update all windows except the currently selected one
         for (int i = 0; i < Windows.size(); i++) {
-            if (Windows.at(i).IsShowing() && selected != i) {
-                Windows.at(i).Update();
-            }
-        }
-        // Change color of selected window
-        if (selected >= 0 && selected < Windows.size()) {
-            if (Windows.at(selected).IsShowing()) {
-                wattron(Windows.at(selected).getWindow(), COLOR_PAIR(2));
-                Windows.at(selected).Update();
-                wattroff(Windows.at(selected).getWindow(), COLOR_PAIR(2));
+            if (i != selected && Windows[i].IsShowing()) {
+                Windows[i].Update();
             }
         }
 
-        // Do user input
+        // Highlight the selected window
+        if (selected >= 0 && selected < Windows.size() && Windows[selected].IsShowing()) {
+            wattron(Windows[selected].getWindow(), COLOR_PAIR(2));
+            Windows[selected].Update();
+            wattroff(Windows[selected].getWindow(), COLOR_PAIR(2));
+        }
+
+        // Handle user input
         int c = getch();
         switch (c) {
             case KEY_LEFT:
                 if (cur_col > 0) {
-                    // Move to the previous column in the current row
                     cur_col--;
                 } else {
-                    // Wrap around to the last column in the current row
-                    cur_col = WindowLayout[cur_row].size() - 1;
+                    cur_col = WindowLayout[cur_row].size() - 1; // Wrap to the last column
                 }
-                UpdateSelected(selected, cur_row, cur_col, prevSelected);
                 break;
 
             case KEY_RIGHT:
-                if (cur_col == WindowLayout[cur_row].size()-1) {
-                    cur_col = 0;
-                }
-                else {
+                if (cur_col < WindowLayout[cur_row].size() - 1) {
                     cur_col++;
+                } else {
+                    cur_col = 0; // Wrap to the first column
                 }
-                UpdateSelected(selected, cur_row, cur_col, prevSelected);
                 break;
 
             case KEY_UP:
-                if (cur_row == 0) {
-                    cur_row = WindowLayout.size()-1;
-                } else {
+                if (cur_row > 0) {
                     cur_row--;
+                } else {
+                    cur_row = WindowLayout.size() - 1; // Wrap to the last row
                 }
-                UpdateSelected(selected, cur_row, cur_col, prevSelected);
+
+                // Adjust column index if the new row has fewer columns
+                if (cur_col >= WindowLayout[cur_row].size()) {
+                    cur_col = WindowLayout[cur_row].size() - 1;
+                }
                 break;
 
             case KEY_DOWN:
-                if (cur_row == WindowLayout.size()-1) {
-                    cur_row = 0;
-                } else {
+                if (cur_row < WindowLayout.size() - 1) {
                     cur_row++;
+                } else {
+                    cur_row = 0; // Wrap to the first row
                 }
-                UpdateSelected(selected, cur_row, cur_col, prevSelected);
+
+                // Adjust column index if the new row has fewer columns
+                if (cur_col >= WindowLayout[cur_row].size()) {
+                    cur_col = WindowLayout[cur_row].size() - 1;
+                }
                 break;
-            
+
             default:
                 gameOn = false;
+                continue;
         }
+
+        // Update selected
+        UpdateSelected(selected, cur_row, cur_col);
     }
 }
 
@@ -215,7 +182,6 @@ int main() {
     initscr();
     start_color();
     cbreak();
-    noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
     
@@ -230,7 +196,7 @@ int main() {
     }
 
     init_color(COLOR_WHITE, 700, 700, 700);
-    init_color(COLOR_CYAN, 1000, 1000, 1000);
+   // init_color(COLOR_CYAN, 1000, 1000, 1000);
 
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
@@ -239,18 +205,24 @@ int main() {
     resize_term(80, 80);
 
 
-    WindowClass Intro = WindowClass(10, 40, 0, 0, true, true, IntroMethod);
+    WindowClass Intro = WindowClass(10, 30, 0, 0, true, true, IntroMethod);
     WindowClass Game = WindowClass(13, 26, 10, 0, true, true, GameMethod);
-    WindowClass Test = WindowClass(13, 14, 10, 26, true, true, TestMethod);
+    WindowClass Test = WindowClass(13, 14, 10, 26, true, true);
+    WindowClass Test2 = WindowClass(10, 15, 0, 30, true, true);
+    WindowClass Test3 = WindowClass(10, 12, 0, 45, true, true);
+
 
     WindowLayout = {
-        {0},
+        {0, 3, 4},
         {1, 2}
     };
 
     Windows.push_back(Intro);
     Windows.push_back(Game);
     Windows.push_back(Test);
+    Windows.push_back(Test2);
+    Windows.push_back(Test3);
+
 
     StartGame();
 
