@@ -27,7 +27,7 @@ class WindowClass {
             y = _y * std_unit;
             x = _x * std_unit * 2;
             win = newwin(cur_h, cur_w, y, x);
-        }  
+        }
 
         WINDOW * getWindow() {
             return win;
@@ -156,6 +156,10 @@ void StartGame() {
     }
 
     while (gameOn) {
+        int w, h;
+        getmaxyx(stdscr, h, w);
+        mvprintw(0, 50, "term width: %d, height: %d", w, h);
+
         // Update all windows except the currently selected one
         for (int i = 0; i < Windows.size(); i++) {
             if (i != selected && Windows[i].IsShowing()) {
