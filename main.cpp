@@ -192,9 +192,6 @@ void StartGame() {
             default:
                 gameOn = false;
         }
-
-        // Add a simple delay to prevent an infinite loop from hogging CPU resources
-        napms(100);
     }
 }
 
