@@ -23,7 +23,8 @@ and play with someone else on the internet. Will it be player hosted? Most likel
 ### Advice for debugging
 
 If you wanna debug, you're gonna need gdb for that, so get MSYS2, update it to the max with `pacman -Syu`,
-and install gdb. If that's tricky to do off the top of your head, look it up with AI or the internet.
+and install gdb. Make sure MSYS is fully updated, so be sure to run `pacman -Syu` a couple of times. Once its updated,
+run `pacman -S gdb` to install gdb onto your device. Now you can debug in vscode, bruh!
 <br>
 Mate, then everything should realistically be perfect, leave the repo as it is, don't touch the .vscode folder, and get cracking.
 <br>
