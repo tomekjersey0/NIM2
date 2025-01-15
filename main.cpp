@@ -77,6 +77,12 @@ class WindowClass {
 
         void Update() {
             if (isShowing) {
+                // Unnecessary really but you never know what would happen uhhh
+                if (win == nullptr) {
+                    TimedErrorExit("Error: win is nullptr in Update()", 3);
+                    return;
+                }
+
                 if (callback) {
                     callback(win); // Call the callback if the window is showing
                 }
@@ -326,9 +332,8 @@ int main() {
 
     // Input layout data based on the windows defined immediately later
     WindowLayout = {
-        {0},
-        {1, 2},
-        {3}
+        {0, 3},
+        {1, 2}
     };
 
     // Just makes it so that after resizing to the right size, everything renders just fine. 
@@ -338,10 +343,12 @@ int main() {
     const int std_unit = 10;
     //                             2, 3 --> 1, 4                    // Selectable, Showing, Border
     Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, IntroMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod, true, true, false));
+    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod));
     Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod));
     Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod));
 
+    // ! Issue with alternative layouts lies in the implementation of the SetTerminalSize function
+    // ! Please fix this!
     SetTerminalSize(Windows, WindowLayout);
 
     StartGame();
