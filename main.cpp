@@ -33,6 +33,11 @@ class WindowClass {
             return win;
         }
 
+        void Normalize(int x_offset, int y_offset) {
+            x -= x_offset;
+            y = y_offset;
+        }
+
         void setSize(int height_stdunit, int width_stdunit) {
             cur_h = height_stdunit * std_unit;
             cur_w = width_stdunit * std_unit;
@@ -273,36 +278,36 @@ void TimedErrorExit(std::string errorMessage, int countdownTime) {
     }
 }
 
-void SetTerminalSize(std::vector<WindowClass> Windows, std::vector<std::vector<int>> WindowLayout) {
-    // * works I guess??
-    // Get max height
-    int maxHeight = 0;
-    for (int i = 0; i < WindowLayout.size(); i++) {
-        int tallestInRow = 0;
-        for (int j = 0; j < WindowLayout[i].size(); j++) {
-            int windowHeight = Windows[WindowLayout[i][j]].getHeight();
-            int windowPosition = Windows[WindowLayout[i][j]].getY();
-            if (windowHeight > tallestInRow && Windows[WindowLayout[i][j]].IsShowing()) {
-                tallestInRow = windowHeight;
-            }
+void SetTerminalSize(std::vector<WindowClass>& Windows) {
+    int lowest_y = Windows[0].getY(), lowest_x = Windows[0].getX(),
+        highest_x_width = 0, highest_y_height = 0;
+    for (auto& window : Windows) {
+        // find lowest x and y values
+        if (window.getY() < lowest_y) {
+            lowest_y = window.getY();
         }
-        maxHeight += tallestInRow;
+        if (window.getX() < lowest_x) {
+            lowest_x = window.getX();
+        }
+        // find highest x + width and y + height values
+        if (window.getX() + window.getWidth() > highest_x_width) {
+            highest_x_width = window.getX() + window.getWidth();
+        }
+        if (window.getY() + window.getHeight() > highest_y_height) {
+            highest_y_height = window.getY() + window.getHeight();
+        }
     }
-    // Get max width
-    int maxWidth = 0;
-    for (int i = 0; i < WindowLayout.size(); i++) {
-        int rowWidth = 0;
-        for (int j = 0; j < WindowLayout[i].size(); j++) {
-            if (Windows[WindowLayout[i][j]].IsShowing()) {
-                rowWidth += Windows[WindowLayout[i][j]].getWidth();
-            }
-        }
-        if (rowWidth > maxWidth) {
-            maxWidth = rowWidth;
+    // get size of terminal
+    int termWidth = highest_x_width - lowest_x;
+    int termHeight = highest_y_height - lowest_y;
+    // normalize positions
+    if (lowest_x != 0 || lowest_y != 0) {
+        for (auto& window : Windows) {
+            window.Normalize(lowest_x, lowest_y);
         }
     }
 
-    resize_term(maxHeight, maxWidth);
+    resize_term(termHeight, termWidth);
 }
 
 int main() {
@@ -332,8 +337,8 @@ int main() {
 
     // Input layout data based on the windows defined immediately later
     WindowLayout = {
-        {0, 3},
-        {1, 2}
+        {0},
+        {1, 2, 3}
     };
 
     // Just makes it so that after resizing to the right size, everything renders just fine. 
@@ -349,7 +354,7 @@ int main() {
 
     // ! Issue with alternative layouts lies in the implementation of the SetTerminalSize function
     // ! Please fix this!
-    SetTerminalSize(Windows, WindowLayout);
+    SetTerminalSize(Windows);
 
     StartGame();
 
