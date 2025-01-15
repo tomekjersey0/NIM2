@@ -2,12 +2,23 @@
 #include <iostream>
 #include <vector>
 
-void TimedErrorExit(std::string message, int countdownTime);
+enum MODE {
+    MOVING, INTERACTING
+};
+
+enum COLOR {
+    NORMAL = 1,
+    SELECTED_MOVING = 2,
+    SELECTED_INTERACTING = 3
+};
+
+void TimedErrorExit(std::string message, int countdownTime=3);
 
 class WindowClass {
     private:
         bool has_border, isShowing, isSelectable;
         int cur_w, cur_h, x, y, std_unit;
+        COLOR BorderColor;
         WINDOW *win;
         void (*callback)(WINDOW * win); // Proper function pointer declaration
 
@@ -28,6 +39,10 @@ class WindowClass {
             x = _x * std_unit * 2;
             // Create the window only after the x, y, and dimension values have been properly normalized
             //win = newwin(cur_h, cur_w, y, x);
+        }
+
+        void setBorderColor(COLOR color) {
+            BorderColor = color;
         }
 
         WINDOW * getWindow() {
@@ -107,7 +122,9 @@ class WindowClass {
                 }
 
                 if (has_border) {
+                    wattron(win, COLOR_PAIR(BorderColor));
                     box(win, 0, 0); // Draw border if needed
+                    wattroff(win, COLOR_PAIR(BorderColor));
                 }
 
                 wrefresh(win); // Refresh the window to update display
@@ -151,6 +168,50 @@ void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int
     selected = WindowLayoutC[row][col];
 }
 
+void MoveWindow(int KEY_DIR, std::vector<std::vector<int>> WindowLayoutC, int& cur_row, int& cur_col) {
+    switch (KEY_DIR) {
+        case KEY_LEFT:
+            if (cur_col > 0) {
+                cur_col--;
+            } else {
+                cur_col = WindowLayoutC[cur_row].size() - 1; // Wrap to the last column
+            }
+            break;
+        case KEY_RIGHT:
+            if (cur_col < WindowLayoutC[cur_row].size() - 1) {
+                cur_col++;
+            } else {
+                cur_col = 0; // Wrap to the first column
+            }
+            break;
+
+        case KEY_UP:
+            if (cur_row > 0) {
+                cur_row--;
+            } else {
+                cur_row = WindowLayoutC.size() - 1; // Wrap to the last row
+            }
+
+            // Adjust column index if the new row has fewer columns
+            if (cur_col >= WindowLayoutC[cur_row].size()) {
+                cur_col = WindowLayoutC[cur_row].size() - 1;
+            }
+            break;
+        case KEY_DOWN:
+            if (cur_row < WindowLayoutC.size() - 1) {
+                cur_row++;
+            } else {
+                cur_row = 0; // Wrap to the first row
+            }
+
+            // Adjust column index if the new row has fewer columns
+            if (cur_col >= WindowLayoutC[cur_row].size()) {
+                cur_col = WindowLayoutC[cur_row].size() - 1;
+            }
+            break;
+    }
+}
+
 void StartGame() {
     if (WindowLayout.empty() || Windows.empty()) {
         TimedErrorExit("Error: Window layout or windows list is empty.");
@@ -164,6 +225,7 @@ void StartGame() {
     }
 
     bool gameOn = true;
+    MODE mode = MODE::MOVING;
     int selected; // Default to the first selectable window
     int cur_row, cur_col; // Set based on selected
 
@@ -194,15 +256,23 @@ void StartGame() {
         // Update all windows except the currently selected one
         for (int i = 0; i < Windows.size(); i++) {
             if (i != selected && Windows[i].IsShowing()) {
+                Windows[i].setBorderColor(COLOR::NORMAL);
                 Windows[i].Update();
             }
         }
 
         // Highlight the selected window
         if (selected >= 0 && selected < Windows.size() && Windows[selected].IsShowing()) {
-            wattron(Windows[selected].getWindow(), COLOR_PAIR(2));
+            switch (mode) {
+                case MODE::MOVING:
+                    Windows[selected].setBorderColor(COLOR::SELECTED_MOVING);
+                    break;
+                case MODE::INTERACTING:
+                    Windows[selected].setBorderColor(COLOR::SELECTED_INTERACTING);
+                    break;
+
+            }
             Windows[selected].Update();
-            wattroff(Windows[selected].getWindow(), COLOR_PAIR(2));
         }
 
         // Prepare WindowLayout Copy, adding only selectable windows
@@ -235,46 +305,20 @@ void StartGame() {
         
         // Handle user input
         int c = getch();
-        switch (c) {
-            case KEY_LEFT:
-                if (cur_col > 0) {
-                    cur_col--;
-                } else {
-                    cur_col = WindowLayoutC[cur_row].size() - 1; // Wrap to the last column
-                }
-                break;
-            case KEY_RIGHT:
-                if (cur_col < WindowLayoutC[cur_row].size() - 1) {
-                    cur_col++;
-                } else {
-                    cur_col = 0; // Wrap to the first column
-                }
-                break;
-
-            case KEY_UP:
-                if (cur_row > 0) {
-                    cur_row--;
-                } else {
-                    cur_row = WindowLayoutC.size() - 1; // Wrap to the last row
-                }
-
-                // Adjust column index if the new row has fewer columns
-                if (cur_col >= WindowLayoutC[cur_row].size()) {
-                    cur_col = WindowLayoutC[cur_row].size() - 1;
-                }
-                break;
-            case KEY_DOWN:
-                if (cur_row < WindowLayoutC.size() - 1) {
-                    cur_row++;
-                } else {
-                    cur_row = 0; // Wrap to the first row
-                }
-
-                // Adjust column index if the new row has fewer columns
-                if (cur_col >= WindowLayoutC[cur_row].size()) {
-                    cur_col = WindowLayoutC[cur_row].size() - 1;
-                }
-                break;
+        // Move the window if in move window mode
+        if (mode == MODE::MOVING) {
+            // Press ENTER to interact with the selected window
+            if (c == 10) {
+                mode = MODE::INTERACTING;
+            }
+            MoveWindow(c, WindowLayoutC, cur_row, cur_col);
+        } else
+        // Interact with the window if the mode is different
+        if (mode == MODE::INTERACTING) {
+            // Press ESCAPE to exit to moving mode
+            if (c == 27) {
+                mode = MODE::MOVING;
+            }
         }
 
         // Update selected
@@ -282,7 +326,7 @@ void StartGame() {
     }
 }
 
-void TimedErrorExit(std::string errorMessage, int countdownTime=3) {
+void TimedErrorExit(std::string errorMessage, int countdownTime /* = 3*/) {
     printw("%s", errorMessage.c_str());
     refresh();
     for (int i = countdownTime; i > 0; i--) {
@@ -361,7 +405,10 @@ int main() {
     // init_color(COLOR_CYAN, 1000, 1000, 1000);
 
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    // Color for window movement mode -> selected window
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
+    // Color for inside window mode -> selected window
+    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
 
     // Input layout data based on the windows defined immediately later
     WindowLayout = {
@@ -376,10 +423,10 @@ int main() {
 
     const int std_unit = 10;
     //                             2, 3 --> 1, 4                    // Selectable, Showing, Border
-    Windows.push_back(WindowClass(std_unit, 1, 4, 1, 2, IntroMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 3, 2, 2, GameMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 1, 2, 5, SelectionMethod));
-    Windows.push_back(WindowClass(std_unit, 1, 4, 4, 2, ScoreMethod));
+    Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, IntroMethod));
+    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod));
+    Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod));
+    Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod));
 
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!
