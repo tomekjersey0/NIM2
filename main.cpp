@@ -336,9 +336,9 @@ int main() {
     resize_term(1000, 1000);
 
     const int std_unit = 10;
-    //                        2, 3 --> 1, 4                        // Selectable, Showing, Border
+    //                             2, 3 --> 1, 4                    // Selectable, Showing, Border
     Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, IntroMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod, false, false));
+    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod, true, true, false));
     Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod));
     Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod));
 
