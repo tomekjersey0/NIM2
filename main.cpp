@@ -26,26 +26,38 @@ class WindowClass {
             cur_w = width * std_unit * 2;
             y = _y * std_unit;
             x = _x * std_unit * 2;
-            win = newwin(cur_h, cur_w, y, x);
+            // Create the window only after the x, y, and dimension values have been properly normalized
+            //win = newwin(cur_h, cur_w, y, x);
         }
 
         WINDOW * getWindow() {
             return win;
         }
 
+        void InitWindow() {
+            if (win != nullptr) {
+                win = newwin(cur_h, cur_w, y, x); 
+            }
+            else {
+                std::cerr << "Window has already been initliazed" << std::endl;
+            }
+        }
+
         void Normalize(int x_offset, int y_offset) {
             x -= x_offset;
-            y = y_offset;
+            y -= y_offset;
         }
 
         void setSize(int height_stdunit, int width_stdunit) {
             cur_h = height_stdunit * std_unit;
             cur_w = width_stdunit * std_unit;
+            resize_window(win, cur_h, cur_w);
         }
 
         void setPos (int x_stdunit, int y_stdunit) {
             x = x_stdunit * std_unit;
             y = y_stdunit * std_unit;
+            mvwin(win, y, x);
         }
 
         int getHeight() {
@@ -84,7 +96,9 @@ class WindowClass {
             if (isShowing) {
                 // Unnecessary really but you never know what would happen uhhh
                 if (win == nullptr) {
-                    TimedErrorExit("Error: win is nullptr in Update()", 3);
+                    // commented out because this lowk annoying asllll
+                    // * Replaced by checking for nullptr win at the beginning of StartGame
+                    //TimedErrorExit("Error: win is nullptr in Update()");
                     return;
                 }
 
@@ -139,8 +153,14 @@ void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int
 
 void StartGame() {
     if (WindowLayout.empty() || Windows.empty()) {
-        std::cerr << "Error: Window layout or windows list is empty." << std::endl;
+        TimedErrorExit("Error: Window layout or windows list is empty.");
         return;
+    }
+
+    for (auto& window : Windows) {
+        if (window.getWindow() == nullptr) {
+            TimedErrorExit("Error: 1 or more windows havent been initialzed");
+        }
     }
 
     bool gameOn = true;
@@ -161,7 +181,7 @@ void StartGame() {
     }
     // Exit if none of the windows are selectable
     if (!selectedFound) {
-        TimedErrorExit("Error: No windows are selectable. Closing. ", 3);
+        TimedErrorExit("Error: No windows are selectable. Closing. ");
         gameOn = false;
         return;
     }
@@ -262,7 +282,7 @@ void StartGame() {
     }
 }
 
-void TimedErrorExit(std::string errorMessage, int countdownTime) {
+void TimedErrorExit(std::string errorMessage, int countdownTime=3) {
     printw("%s", errorMessage.c_str());
     refresh();
     for (int i = countdownTime; i > 0; i--) {
@@ -304,6 +324,14 @@ void SetTerminalSize(std::vector<WindowClass>& Windows) {
     if (lowest_x != 0 || lowest_y != 0) {
         for (auto& window : Windows) {
             window.Normalize(lowest_x, lowest_y);
+            // Finally Initialze the window after its x and y positions are definately within terminal bounds
+            window.InitWindow();
+        }
+    }
+    else {
+        for (auto& window: Windows) {
+            // Make sure to initilaze the windows anyway if they haven't been normalized
+            window.InitWindow();
         }
     }
 
@@ -320,11 +348,11 @@ int main() {
     
     // Initialize colors
     if (!has_colors()) {
-        TimedErrorExit("Error: Colors not available. Closing. ", 3);
+        TimedErrorExit("Error: Colors not available. Closing. ");
         return -1;
     }
     if (!can_change_color()) {
-        TimedErrorExit("Error: Cannot change colors. Closing. ", 3);
+        TimedErrorExit("Error: Cannot change colors. Closing. ");
         return -1;
     }
 
@@ -338,7 +366,8 @@ int main() {
     // Input layout data based on the windows defined immediately later
     WindowLayout = {
         {0},
-        {1, 2, 3}
+        {1, 2},
+        {3}
     };
 
     // Just makes it so that after resizing to the right size, everything renders just fine. 
@@ -347,13 +376,15 @@ int main() {
 
     const int std_unit = 10;
     //                             2, 3 --> 1, 4                    // Selectable, Showing, Border
-    Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, IntroMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod));
-    Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod));
+    Windows.push_back(WindowClass(std_unit, 1, 4, 1, 2, IntroMethod));
+    Windows.push_back(WindowClass(std_unit, 2, 3, 2, 2, GameMethod));
+    Windows.push_back(WindowClass(std_unit, 2, 1, 2, 5, SelectionMethod));
+    Windows.push_back(WindowClass(std_unit, 1, 4, 4, 2, ScoreMethod));
 
-    // ! Issue with alternative layouts lies in the implementation of the SetTerminalSize function
-    // ! Please fix this!
+    // Sets size of terminal based on physical orientation of the windows in the Windows list
+    // * Make sure to run this method before refreshing any windows using this system!
+    // * Otherwise the windows will not be set and won't render!
+    // * Program will probably also crash!
     SetTerminalSize(Windows);
 
     StartGame();
