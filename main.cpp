@@ -1,6 +1,7 @@
 #include <curses.h>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 enum MODE {
     MOVING, INTERACTING
@@ -21,7 +22,6 @@ class WindowClass {
         COLOR BorderColor;
         WINDOW *win;
         void (*callback)(WINDOW * win); // Proper function pointer declaration
-
 
     public:
         WindowClass(const int _std_unit, int height, int width, int _y, int _x,  void (*_callback)(WINDOW * win) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true) : 
@@ -134,12 +134,25 @@ class WindowClass {
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
 
-void RipplePrint(WINDOW * win, const char* text, int delay) {
-    for (int i = 0; text[i] != '\0'; i++) {
-        mvwprintw(win, 1, 1, "%c", text[i]);
-        refresh();
-    }
-}
+class RipplePrint 
+{
+    private:
+        std::string text;
+        int progress, delay, x, y;
+        COLOR color;
+
+    public:
+        RipplePrint(std::string text, int x, int y, int delay=0.03, COLOR color=COLOR::NORMAL) : 
+        text(text),
+        x(x),
+        y(y),
+        delay(delay),
+        color(color)
+        { 
+            progress = 0;
+        }
+
+};
 
 void IntroMethod(WINDOW * win) {
     mvwprintw(win, 1, 1, "Welcome to the Game!");
