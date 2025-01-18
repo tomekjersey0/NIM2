@@ -2,12 +2,13 @@
 #ifndef WINDOWCLASS_H
 #define WINDOWCLASS_H
 
+#include <curses.h>
 #include <vector>
 #include <iostream>
-#include "RipplePrint.h"
-#include "IWindowsClass.h"
+#include "enums.h"
+#include <RipplePrint.h>
 
-class WindowClass : public IWindowClass{
+class WindowClass {
     private:
         bool has_border, isShowing, isSelectable;
         int cur_w, cur_h, x, y, std_unit;

@@ -1,12 +1,13 @@
-#pragma once
 #ifndef RIPPLEPRINT_H
 #define RIPPLEPRINT_H
 
 #include <curses.h>
+#include <string>
+#include <chrono>
 #include "enums.h"
-#include "IWindowClass.h"
+#include "WindowClass.h"
 
-class RipplePrint : public IWindowClass {
+class RipplePrint {
     private:
         std::string text;
         int progress, delay, x, y;
