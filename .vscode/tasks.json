@@ -6,8 +6,9 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "-g",                             // Enable debug symbols
-                "main.cpp",
+                "-g",
+                "-Iinclude",                       // Enable debug symbols
+                "src/*.cpp",
                 "-o",
                 "main",
                 "-lpdcurses"
