@@ -47,7 +47,6 @@ class WindowClass {
         }
 
         std::vector<RipplePrint*> getRipples();
-
         void setBorderColor(COLOR color);
         void AddRipple(RipplePrint* rip);
         WINDOW * getWindow();
@@ -76,8 +75,10 @@ std::vector<std::vector<int>> WindowLayout;
 class RipplePrint 
 {
     private:
-        std::string text;
-        int progress, delay, x, y;
+        std::string text, nowText;
+        int progress, x, y;
+        bool done, looping;
+        double delay, interval;
         COLOR color;
         std::chrono::_V2::system_clock::time_point startTime;
         WindowClass * parent;
@@ -100,25 +101,65 @@ class RipplePrint
             return text;
         }
 
-        RipplePrint(WindowClass * _parent, std::string _text, int _x, int _y, int _delay=0.03, COLOR _color=COLOR::NORMAL) : 
+        RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text,double _interval = -1, double _delay=0.05, COLOR _color=COLOR::NORMAL) : 
             parent(_parent),
             text(_text),
             x(_x),
             y(_y),
             delay(_delay),
-            color(_color)
+            color(_color),
+            interval(_interval)
         {
             startTime = std::chrono::system_clock::now();
             progress = 0;
             parent->AddRipple(this);
             win = parent->getWindow();
+            nowText = "";
+            if (_interval < 0 /* so is -1 or bogus value*/) {
+                // assume it hasn't been set
+                looping = false;
+            }
+            else {
+                looping = true;
+            }
+        }
+
+        void eraseRipple() {
+            std::string textBlank;
+            for (int i = 0; i < text.length(); i++) {
+                textBlank += " ";
+            }
+            mvwprintw(win, y, x, textBlank.c_str());
+        }
+
+        void restartRipple() {
+            eraseRipple();
+            done = false;
+            progress = 0;
+            nowText = "";
         }
 
         void Update() {
             auto now = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed = now - startTime;
             double elapsedSeconds = elapsed.count();
-            mvwprintw(win, 1, 1, "%f", elapsedSeconds);
+
+            if (elapsedSeconds >= delay && !done) {
+                nowText += text[progress];
+                mvwprintw(win, y, x, nowText.c_str());
+                startTime = std::chrono::system_clock::now();
+                progress++;
+                if (progress == text.length()) {
+                    done = true;
+                    progress = 0;
+                }
+            }
+
+            if (looping && done) {
+                if (elapsedSeconds >= interval) {
+                    restartRipple();
+                }
+            }
         }
 
 };
@@ -217,10 +258,15 @@ void WindowClass::Update() {
             box(win, 0, 0); // Draw border if needed
             wattroff(win, COLOR_PAIR(BorderColor));
         }
+        //auto now = std::chrono::system_clock::now();
 
         for (auto rip : Ripples) {
             rip->Update();
         }
+
+        //std::chrono::duration<double> elapsed2 = now - std::chrono::system_clock::now();
+        //double elapsedSeconds2 = elapsed2.count();
+        //mvwprintw(win, 1, 1, "all ripples time: %f seconds / ripple count: %d", elapsed2, Ripples.size());
 
         wrefresh(win); // Refresh the window to update display
     }
@@ -409,6 +455,8 @@ void StartGame() {
 
         // Update selected
         UpdateSelected(selected, cur_row, cur_col, WindowLayoutC);
+
+        napms(10);
     }
 }
 
@@ -475,6 +523,7 @@ int main() {
     noecho();
     curs_set(0);
     keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE);
     
     // Initialize colors
     if (!has_colors()) {
@@ -512,28 +561,20 @@ int main() {
     const int std_unit = 10;
 
     WindowClass(&Windows, std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, "Testing ahh", 2, 2);
+        new RipplePrint(parent, 2, 2, "Intro", 1);
     });
 
     WindowClass(&Windows, std_unit, 2, 3, 1, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, "Testing ahh", 2, 2);
+        new RipplePrint(parent, 2, 2, "Game", 0.5);
     });
 
-    /*
-    // Last the bool params: Selectable, Showing, Border
-    Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
-        RipplePrint(parent, "Testing ahh", 2, 2);
-    }));
-    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, [](WindowClass* parent) {
-        
-    }));
-    Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, [](WindowClass* parent) {
-        
-    }));
-    Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
-        
-    }));
-    */
+    WindowClass(&Windows, std_unit, 2, 1, 1, 3, [](WindowClass* parent) {
+        new RipplePrint(parent, 2, 2, "Select", 2);
+    });
+
+    WindowClass(&Windows, std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
+        new RipplePrint(parent, 2, 2, "Score");
+    });
 
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!
