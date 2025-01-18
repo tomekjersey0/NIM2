@@ -24,8 +24,11 @@ class WindowClass {
         void (*content)(WindowClass * win); // Proper function pointer declaration
         std::vector<RipplePrint*> Ripples;
 
+        std::vector<WindowClass> * Windows;
+
     public:
-        WindowClass(const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true) : 
+        WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true) : 
+            Windows(_Windows),
             std_unit(_std_unit),
             y(_y),
             x(_x),
@@ -39,7 +42,11 @@ class WindowClass {
             cur_w = width * std_unit * 2;
             y = _y * std_unit;
             x = _x * std_unit * 2;
+
+            Windows->push_back(*this);
         }
+
+        std::vector<RipplePrint*> getRipples();
 
         void setBorderColor(COLOR color);
         void AddRipple(RipplePrint* rip);
@@ -48,6 +55,7 @@ class WindowClass {
         void Normalize(int x_offset, int y_offset);
         void setSize(int height_stdunit, int width_stdunit);
         void setPos (int x_stdunit, int y_stdunit);
+        int getRippleCount();
         int getHeight();       
         int getWidth();
         int getX();
@@ -72,13 +80,28 @@ class RipplePrint
         int progress, delay, x, y;
         COLOR color;
         std::chrono::_V2::system_clock::time_point startTime;
+        WindowClass * parent;
+        WINDOW * win;
 
     public:
         std::chrono::_V2::system_clock::time_point getStartTime() {
             return startTime;
         }
 
-        RipplePrint(WindowClass * __parent, std::string _text, int _x, int _y, int _delay=0.03, COLOR _color=COLOR::NORMAL) : 
+        int getX() {
+            return x;
+        }
+
+        int getY() {
+            return y;
+        }
+
+        std::string getText() {
+            return text;
+        }
+
+        RipplePrint(WindowClass * _parent, std::string _text, int _x, int _y, int _delay=0.03, COLOR _color=COLOR::NORMAL) : 
+            parent(_parent),
             text(_text),
             x(_x),
             y(_y),
@@ -87,18 +110,22 @@ class RipplePrint
         {
             startTime = std::chrono::system_clock::now();
             progress = 0;
-            // __parent turns to nullptr outside of the scope of the constructor function, as that is the nature of lamda functions
-            __parent->AddRipple(this);
+            parent->AddRipple(this);
+            win = parent->getWindow();
         }
 
-        void Update(WindowClass * _parent) {
+        void Update() {
             auto now = std::chrono::system_clock::now();
             std::chrono::duration<double> elapsed = now - startTime;
-            mvwprintw(_parent->getWindow(), y, x, text.c_str());
-            mvwprintw(_parent->getWindow(), 1, 1, "height: %d!", _parent->getHeight());
+            double elapsedSeconds = elapsed.count();
+            mvwprintw(win, 1, 1, "%f", elapsedSeconds);
         }
 
 };
+
+std::vector<RipplePrint*> WindowClass::getRipples() {
+    return Ripples;
+}
 
 void WindowClass::setBorderColor(COLOR color) {
     BorderColor = color;
@@ -151,6 +178,10 @@ int WindowClass::getHeight() {
     return cur_h;
 }        
 
+int WindowClass::getRippleCount() {
+    return Ripples.size();
+}
+
 int WindowClass::getWidth() {
     return cur_w;
 }
@@ -188,7 +219,7 @@ void WindowClass::Update() {
         }
 
         for (auto rip : Ripples) {
-            rip->Update(this);
+            rip->Update();
         }
 
         wrefresh(win); // Refresh the window to update display
@@ -479,6 +510,16 @@ int main() {
     resize_term(1000, 1000);
 
     const int std_unit = 10;
+
+    WindowClass(&Windows, std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
+        new RipplePrint(parent, "Testing ahh", 2, 2);
+    });
+
+    WindowClass(&Windows, std_unit, 2, 3, 1, 0, [](WindowClass* parent) {
+        new RipplePrint(parent, "Testing ahh", 2, 2);
+    });
+
+    /*
     // Last the bool params: Selectable, Showing, Border
     Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
         RipplePrint(parent, "Testing ahh", 2, 2);
@@ -492,6 +533,8 @@ int main() {
     Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
         
     }));
+    */
+
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!
     // * Otherwise the windows will not be set and won't render!
