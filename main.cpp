@@ -13,7 +13,7 @@ enum COLOR {
     SELECTED_INTERACTING = 3
 };
 
-void TimedErrorExit(std::string message, int countdownTime=3);
+class RipplePrint;
 
 class WindowClass {
     private:
@@ -21,116 +21,47 @@ class WindowClass {
         int cur_w, cur_h, x, y, std_unit;
         COLOR BorderColor;
         WINDOW *win;
-        void (*callback)(WINDOW * win); // Proper function pointer declaration
+        void (*content)(WindowClass * win); // Proper function pointer declaration
+        std::vector<RipplePrint*> Ripples;
 
     public:
-        WindowClass(const int _std_unit, int height, int width, int _y, int _x,  void (*_callback)(WINDOW * win) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true) : 
+        WindowClass(const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true) : 
             std_unit(_std_unit),
             y(_y),
             x(_x),
             has_border(has_border),
             isShowing(isShowing),
             isSelectable(isSelectable),
-            callback(_callback) // Direct initialization
+            content(_content) // Direct initialization
         {
+            win = nullptr;
             cur_h = height * std_unit;
             cur_w = width * std_unit * 2;
             y = _y * std_unit;
             x = _x * std_unit * 2;
-            // Create the window only after the x, y, and dimension values have been properly normalized
-            //win = newwin(cur_h, cur_w, y, x);
         }
 
-        void setBorderColor(COLOR color) {
-            BorderColor = color;
-        }
-
-        WINDOW * getWindow() {
-            return win;
-        }
-
-        void InitWindow() {
-            if (win != nullptr) {
-                win = newwin(cur_h, cur_w, y, x); 
-            }
-            else {
-                std::cerr << "Window has already been initliazed" << std::endl;
-            }
-        }
-
-        void Normalize(int x_offset, int y_offset) {
-            x -= x_offset;
-            y -= y_offset;
-        }
-
-        void setSize(int height_stdunit, int width_stdunit) {
-            cur_h = height_stdunit * std_unit;
-            cur_w = width_stdunit * std_unit;
-            resize_window(win, cur_h, cur_w);
-        }
-
-        void setPos (int x_stdunit, int y_stdunit) {
-            x = x_stdunit * std_unit;
-            y = y_stdunit * std_unit;
-            mvwin(win, y, x);
-        }
-
-        int getHeight() {
-            return cur_h;
-        }        
-
-        int getWidth() {
-            return cur_w;
-        }
-
-        int getX() {
-            return x;
-        }
-
-        int getY() {
-            return y;
-        }
-        
-        bool IsShowing() {
-            return isShowing;
-        }
-
-        void IsShowing(bool set) {
-            isShowing = set;
-        }
-
-        bool IsSelectable() {
-            return isSelectable;
-        }
-
-        void IsSelectable (bool set) {
-            isSelectable = set;
-        }
-
-        void Update() {
-            if (isShowing) {
-                // Unnecessary really but you never know what would happen uhhh
-                if (win == nullptr) {
-                    // commented out because this lowk annoying asllll
-                    // * Replaced by checking for nullptr win at the beginning of StartGame
-                    //TimedErrorExit("Error: win is nullptr in Update()");
-                    return;
-                }
-
-                if (callback) {
-                    callback(win); // Call the callback if the window is showing
-                }
-
-                if (has_border) {
-                    wattron(win, COLOR_PAIR(BorderColor));
-                    box(win, 0, 0); // Draw border if needed
-                    wattroff(win, COLOR_PAIR(BorderColor));
-                }
-
-                wrefresh(win); // Refresh the window to update display
-            }
-        }
+        void setBorderColor(COLOR color);
+        void AddRipple(RipplePrint* rip);
+        WINDOW * getWindow();
+        void InitWindow();
+        void Normalize(int x_offset, int y_offset);
+        void setSize(int height_stdunit, int width_stdunit);
+        void setPos (int x_stdunit, int y_stdunit);
+        int getHeight();       
+        int getWidth();
+        int getX();
+        int getY();
+        bool IsShowing();
+        void IsShowing(bool set);
+        bool IsSelectable();
+        void IsSelectable (bool set) ;
+        void Update();
 };
+
+void TimedErrorExit(std::string message, int countdownTime=3);
+void SetTerminalSize(std::vector<WindowClass>& Windows);
+
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
 
@@ -140,19 +71,129 @@ class RipplePrint
         std::string text;
         int progress, delay, x, y;
         COLOR color;
+        std::chrono::_V2::system_clock::time_point startTime;
 
     public:
-        RipplePrint(std::string text, int x, int y, int delay=0.03, COLOR color=COLOR::NORMAL) : 
-        text(text),
-        x(x),
-        y(y),
-        delay(delay),
-        color(color)
-        { 
+        std::chrono::_V2::system_clock::time_point getStartTime() {
+            return startTime;
+        }
+
+        RipplePrint(WindowClass * __parent, std::string _text, int _x, int _y, int _delay=0.03, COLOR _color=COLOR::NORMAL) : 
+            text(_text),
+            x(_x),
+            y(_y),
+            delay(_delay),
+            color(_color)
+        {
+            startTime = std::chrono::system_clock::now();
             progress = 0;
+            // __parent turns to nullptr outside of the scope of the constructor function, as that is the nature of lamda functions
+            __parent->AddRipple(this);
+        }
+
+        void Update(WindowClass * _parent) {
+            auto now = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed = now - startTime;
+            mvwprintw(_parent->getWindow(), y, x, text.c_str());
+            mvwprintw(_parent->getWindow(), 1, 1, "height: %d!", _parent->getHeight());
         }
 
 };
+
+void WindowClass::setBorderColor(COLOR color) {
+    BorderColor = color;
+}
+
+void WindowClass::AddRipple(RipplePrint* rip) {
+    Ripples.push_back(rip);
+}
+
+WINDOW * WindowClass::getWindow() {
+    return win;
+}
+
+void WindowClass::InitWindow() {
+    if (win == nullptr) {
+        win = newwin(cur_h, cur_w, y, x); 
+
+        // running content in here instead of in the constructor so that that the callback can use fully updated values
+        // possible dynamic content positioning and rendering
+        if (content) {
+            content(this); // Function that adds all the objects to the be display to the window on initialization
+        }
+    }
+    else {
+        std::cerr << "Window has already been initialized" << std::endl;
+    }
+}
+
+void WindowClass::Normalize(int x_offset, int y_offset) {
+    x -= x_offset;
+    y -= y_offset;
+}
+
+void WindowClass::setSize(int height_stdunit, int width_stdunit) {
+    cur_h = height_stdunit * std_unit;
+    cur_w = width_stdunit * std_unit;
+    resize_window(win, cur_h, cur_w);
+}
+
+void WindowClass::setPos (int x_stdunit, int y_stdunit) {
+    int _x = x_stdunit * std_unit;
+    int _y = y_stdunit * std_unit;
+    if (mvwin(win, _y, _x) != ERR) {
+        x = _x;
+        y = _y;
+    }
+}
+
+int WindowClass::getHeight() {
+    return cur_h;
+}        
+
+int WindowClass::getWidth() {
+    return cur_w;
+}
+
+int WindowClass::getX() {
+    return x;
+}
+
+int WindowClass::getY() {
+    return y;
+}
+
+bool WindowClass::IsShowing() {
+    return isShowing;
+}
+
+void WindowClass::IsShowing(bool set) {
+    isShowing = set;
+}
+
+bool WindowClass::IsSelectable() {
+    return isSelectable;
+}
+
+void WindowClass::IsSelectable (bool set) {
+    isSelectable = set;
+}
+
+void WindowClass::Update() {
+    if (isShowing) {
+        if (has_border) {
+            wattron(win, COLOR_PAIR(BorderColor));
+            box(win, 0, 0); // Draw border if needed
+            wattroff(win, COLOR_PAIR(BorderColor));
+        }
+
+        for (auto rip : Ripples) {
+            rip->Update(this);
+        }
+
+        wrefresh(win); // Refresh the window to update display
+    }
+}
 
 void IntroMethod(WINDOW * win) {
     mvwprintw(win, 1, 1, "Welcome to the Game!");
@@ -233,7 +274,7 @@ void StartGame() {
 
     for (auto& window : Windows) {
         if (window.getWindow() == nullptr) {
-            TimedErrorExit("Error: 1 or more windows havent been initialzed");
+            TimedErrorExit("Error: 1 or more windows haven't been initialzed");
         }
     }
 
@@ -262,6 +303,7 @@ void StartGame() {
     }
 
     while (gameOn) {
+        
         int w, h;
         getmaxyx(stdscr, h, w);
         mvprintw(0, 50, "term width: %d, height: %d", w, h);
@@ -381,13 +423,13 @@ void SetTerminalSize(std::vector<WindowClass>& Windows) {
     if (lowest_x != 0 || lowest_y != 0) {
         for (auto& window : Windows) {
             window.Normalize(lowest_x, lowest_y);
-            // Finally Initialze the window after its x and y positions are definately within terminal bounds
+            // Finally Initialize the window after its x and y positions are definitely within terminal bounds
             window.InitWindow();
         }
     }
     else {
         for (auto& window: Windows) {
-            // Make sure to initilaze the windows anyway if they haven't been normalized
+            // Make sure to initialize the windows anyway if they haven't been normalized
             window.InitWindow();
         }
     }
@@ -417,10 +459,12 @@ int main() {
     // * Makes the selected window color be a brighter white
     // init_color(COLOR_CYAN, 1000, 1000, 1000);
 
+    // Default text Color
     init_pair(1, COLOR_WHITE, COLOR_BLACK);
-    // Color for window movement mode -> selected window
+
+    // Moving selected color
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
-    // Color for inside window mode -> selected window
+    // Interacting selected color
     init_pair(3, COLOR_YELLOW, COLOR_BLACK);
 
     // Input layout data based on the windows defined immediately later
@@ -435,12 +479,19 @@ int main() {
     resize_term(1000, 1000);
 
     const int std_unit = 10;
-    //                             2, 3 --> 1, 4                    // Selectable, Showing, Border
-    Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, IntroMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, GameMethod));
-    Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, SelectionMethod));
-    Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, ScoreMethod));
-
+    // Last the bool params: Selectable, Showing, Border
+    Windows.push_back(WindowClass(std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
+        RipplePrint(parent, "Testing ahh", 2, 2);
+    }));
+    Windows.push_back(WindowClass(std_unit, 2, 3, 1, 0, [](WindowClass* parent) {
+        
+    }));
+    Windows.push_back(WindowClass(std_unit, 2, 1, 1, 3, [](WindowClass* parent) {
+        
+    }));
+    Windows.push_back(WindowClass(std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
+        
+    }));
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!
     // * Otherwise the windows will not be set and won't render!
