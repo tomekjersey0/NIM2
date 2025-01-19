@@ -6,7 +6,8 @@
 #include <vector>
 #include <iostream>
 #include "enums.h"
-#include <RipplePrint.h>
+
+class RipplePrint;
 
 class WindowClass {
     private:
@@ -20,33 +21,9 @@ class WindowClass {
         std::vector<WindowClass> * Windows;
 
     public:
-        WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true) : 
-            Windows(_Windows),
-            std_unit(_std_unit),
-            y(_y),
-            x(_x),
-            has_border(has_border),
-            isShowing(isShowing),
-            isSelectable(isSelectable),
-            content(_content) // Direct initialization
-        {
-            win = nullptr;
-            cur_h = height * std_unit;
-            cur_w = width * std_unit * 2;
-            y = _y * std_unit;
-            x = _x * std_unit * 2;
-
-            Windows->push_back(*this);
-        }
-
-        ~WindowClass() {
-            for (RipplePrint * rip : Ripples) {
-                delete rip;
-            }
-        }
-
+        WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true);
+        ~WindowClass();
         std::vector<RipplePrint*> getRipples();
-
         void setBorderColor(COLOR color);
         void AddRipple(RipplePrint* rip);
         WINDOW * getWindow();

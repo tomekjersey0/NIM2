@@ -5,7 +5,8 @@
 #include <string>
 #include <chrono>
 #include "enums.h"
-#include "WindowClass.h"
+
+class WindowClass;
 
 class RipplePrint {
     private:
@@ -17,19 +18,7 @@ class RipplePrint {
         WINDOW * win;
 
     public:
-        RipplePrint(WindowClass * _parent, std::string _text, int _x, int _y, int _delay=0.03, COLOR _color=COLOR::NORMAL) : 
-            parent(_parent),
-            text(_text),
-            x(_x),
-            y(_y),
-            delay(_delay),
-            color(_color)
-        {
-            startTime = std::chrono::system_clock::now();
-            progress = 0;
-            parent->AddRipple(this);
-            win = parent->getWindow();
-        }
+        RipplePrint(WindowClass * _parent, std::string _text, int _x, int _y, int _delay=0.03, COLOR _color=COLOR::NORMAL);
         std::chrono::_V2::system_clock::time_point getStartTime();
         int getX();
         int getY();

@@ -1,4 +1,30 @@
+#include "RipplePrint.h"
 #include "WindowClass.h"
+
+WindowClass::WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent),  bool isSelectable, bool isShowing, bool has_border) : 
+    Windows(_Windows),
+    std_unit(_std_unit),
+    y(_y),
+    x(_x),
+    has_border(has_border),
+    isShowing(isShowing),
+    isSelectable(isSelectable),
+    content(_content) // Direct initialization
+{
+    win = nullptr;
+    cur_h = height * std_unit;
+    cur_w = width * std_unit * 2;
+    y = _y * std_unit;
+    x = _x * std_unit * 2;
+
+    Windows->push_back(*this);
+}
+
+WindowClass::~WindowClass() {
+    for (RipplePrint * rip : Ripples) {
+        delete rip;
+    }
+}
 
 std::vector<RipplePrint*> WindowClass::getRipples() {
     return Ripples;

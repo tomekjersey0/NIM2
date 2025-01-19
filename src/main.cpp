@@ -1,4 +1,5 @@
 #include "WindowClass.h"
+#include "RipplePrint.h"
 
 void TimedErrorExit(std::string message, int countdownTime=3);
 void SetTerminalSize(std::vector<WindowClass>& Windows);
