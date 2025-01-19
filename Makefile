@@ -1,6 +1,6 @@
 all: build run
 
 build:
-	g++ main.cpp -o main -lpdcurses
+	g++ -Iinclude src/*.cpp -o main -lpdcurses
 run:
 	./main
