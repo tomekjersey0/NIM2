@@ -18,7 +18,7 @@ void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int
     selected = WindowLayoutC[row][col];
 }
 
-void MoveWindow(int KEY_DIR, std::vector<std::vector<int>> WindowLayoutC, int& cur_row, int& cur_col, int& selected) {
+void MoveWindow(int KEY_DIR, const std::vector<std::vector<int>>& WindowLayoutC, int& cur_row, int& cur_col, int& selected) {
     switch (KEY_DIR) {
         case KEY_LEFT:
             if (cur_col > 0) {
@@ -67,7 +67,6 @@ void MoveWindow(int KEY_DIR, std::vector<std::vector<int>> WindowLayoutC, int& c
 void StartGame() {
     if (WindowLayout.empty() || Windows.empty()) {
         TimedErrorExit("Error: Window layout or windows list is empty.");
-        return;
     }
 
     for (auto& window : Windows) {
@@ -97,8 +96,6 @@ void StartGame() {
     // Exit if none of the windows are selectable
     if (!selectedFound) {
         TimedErrorExit("Error: No windows are selectable. Closing. ");
-        gameOn = false;
-        return;
     }
 
     while (gameOn) {
@@ -194,6 +191,7 @@ void TimedErrorExit(std::string errorMessage, int countdownTime /* = 3*/) {
         }
         napms(250);
     }
+    std::exit(EXIT_FAILURE);
 }
 
 void SetTerminalSize(std::vector<WindowClass>& Windows) {
@@ -262,11 +260,9 @@ int main() {
     // Initialize colors
     if (!has_colors()) {
         TimedErrorExit("Error: Colors not available. Closing. ");
-        return -1;
     }
     if (!can_change_color()) {
         TimedErrorExit("Error: Cannot change colors. Closing. ");
-        return -1;
     }
 
     InitColors();
