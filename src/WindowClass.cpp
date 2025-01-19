@@ -9,9 +9,11 @@ WindowClass::WindowClass(std::vector<WindowClass> * _Windows, const int _std_uni
     has_border(has_border),
     isShowing(isShowing),
     isSelectable(isSelectable),
-    content(_content) // Direct initialization
+    content(_content),
+    win(nullptr),
+    BorderColor(COLOR::NORMAL),
+    ContentColor(COLOR::NORMAL)
 {
-    win = nullptr;
     cur_h = height * std_unit;
     cur_w = width * std_unit * 2;
     y = _y * std_unit;

@@ -7,22 +7,6 @@ void SetTerminalSize(std::vector<WindowClass>& Windows);
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
 
-void IntroMethod(WINDOW * win) {
-    mvwprintw(win, 1, 1, "Welcome to the Game!");
-}
-
-void GameMethod(WINDOW * win) {
-    mvwprintw(win, 1, 1, "Game is now showing!");
-}
-
-void SelectionMethod(WINDOW * win) {
-    mvwprintw(win, 1, 1, "Choose your move:");
-}
-
-void ScoreMethod(WINDOW * win) {
-    mvwprintw(win, 1, 1, "Score shown here...");
-}
-
 void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int>> WindowLayoutC) {
     // Ensure row and col are within bounds
     if (row < 0 || row >= WindowLayoutC.size() || col < 0 || col >= WindowLayoutC[row].size()) {
@@ -34,7 +18,7 @@ void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int
     selected = WindowLayoutC[row][col];
 }
 
-void MoveWindow(int KEY_DIR, std::vector<std::vector<int>> WindowLayoutC, int& cur_row, int& cur_col) {
+void MoveWindow(int KEY_DIR, std::vector<std::vector<int>> WindowLayoutC, int& cur_row, int& cur_col, int& selected) {
     switch (KEY_DIR) {
         case KEY_LEFT:
             if (cur_col > 0) {
@@ -76,6 +60,8 @@ void MoveWindow(int KEY_DIR, std::vector<std::vector<int>> WindowLayoutC, int& c
             }
             break;
     }
+
+    UpdateSelected(selected, cur_row, cur_col, WindowLayoutC);
 }
 
 void StartGame() {
@@ -107,6 +93,7 @@ void StartGame() {
         }
         if (selectedFound) break;
     }
+    
     // Exit if none of the windows are selectable
     if (!selectedFound) {
         TimedErrorExit("Error: No windows are selectable. Closing. ");
@@ -115,31 +102,21 @@ void StartGame() {
     }
 
     while (gameOn) {
-        
-        int w, h;
-        getmaxyx(stdscr, h, w);
-        mvprintw(0, 50, "term width: %d, height: %d", w, h);
 
-        // Update all windows except the currently selected one
+        // Update all windows
         for (int i = 0; i < Windows.size(); i++) {
-            if (i != selected && Windows[i].IsShowing()) {
+            if (!Windows[i].IsShowing())
+                continue;
+            if (i == selected) {
+                if (mode == MODE::MOVING) {
+                    Windows[i].setBorderColor(COLOR::SELECTED_MOVING);
+                } else if (mode == MODE::INTERACTING) {
+                    Windows[i].setBorderColor(COLOR::SELECTED_INTERACTING);
+                }
+            } else {
                 Windows[i].setBorderColor(COLOR::NORMAL);
-                Windows[i].Update();
             }
-        }
-
-        // Highlight the selected window
-        if (selected >= 0 && selected < Windows.size() && Windows[selected].IsShowing()) {
-            switch (mode) {
-                case MODE::MOVING:
-                    Windows[selected].setBorderColor(COLOR::SELECTED_MOVING);
-                    break;
-                case MODE::INTERACTING:
-                    Windows[selected].setBorderColor(COLOR::SELECTED_INTERACTING);
-                    break;
-
-            }
-            Windows[selected].Update();
+            Windows[i].Update();
         }
 
         // Prepare WindowLayout Copy, adding only selectable windows
@@ -172,13 +149,14 @@ void StartGame() {
         
         // Handle user input
         int c = getch();
+
         // Move the window if in move window mode
         if (mode == MODE::MOVING) {
             // Press ENTER to interact with the selected window
             if (c == 10) {
                 mode = MODE::INTERACTING;
             }
-            MoveWindow(c, WindowLayoutC, cur_row, cur_col);
+            MoveWindow(c, WindowLayoutC, cur_row, cur_col, selected);
         } else
 
         // Interact with the window if the mode is different
@@ -193,8 +171,10 @@ void StartGame() {
             gameOn = false;
         }
 
-        // Update selected
-        UpdateSelected(selected, cur_row, cur_col, WindowLayoutC);
+        if (c == KEY_RESIZE) {
+            SetTerminalSize(Windows);
+            refresh();
+        }
 
         napms(10);
     }
@@ -256,6 +236,20 @@ void SetTerminalSize(std::vector<WindowClass>& Windows) {
     resize_term(termHeight, termWidth);
 }
 
+void InitColors() {
+    // Make sure ts matches the enum COLOR in enums.h
+    init_color(COLOR_WHITE, 700, 700, 700);
+    init_pair(2, COLOR_CYAN, COLOR_BLACK);
+    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    init_pair(4, COLOR_RED, COLOR_BLACK);
+    init_pair(5, COLOR_GREEN, COLOR_BLACK);
+    init_pair(6, COLOR_BLUE, COLOR_BLACK);
+    init_pair(7, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(8, COLOR_CYAN, COLOR_BLACK);
+    init_pair(9, COLOR_YELLOW, COLOR_BLACK);    
+}
+
 int main() {
     initscr();
     start_color();
@@ -275,17 +269,7 @@ int main() {
         return -1;
     }
 
-    init_color(COLOR_WHITE, 700, 700, 700);
-    // * Makes the selected window color be a brighter white
-    // init_color(COLOR_CYAN, 1000, 1000, 1000);
-
-    // Default text Color
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
-
-    // Moving selected color
-    init_pair(2, COLOR_CYAN, COLOR_BLACK);
-    // Interacting selected color
-    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+    InitColors();
 
     // Input layout data based on the windows defined immediately later
     WindowLayout = {
@@ -301,19 +285,21 @@ int main() {
     const int std_unit = 10;
 
     WindowClass(&Windows, std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Intro", 1);
+        new RipplePrint(parent, 2, 2, "Intro", 1, COLOR::RED);
     });
 
     WindowClass(&Windows, std_unit, 2, 3, 1, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Game", 0.5);
+        new RipplePrint(parent, 2, 2, "Game", 2, COLOR::GREEN);
+        new RipplePrint(parent, 3, 2, "Settings", 1.5, COLOR::YELLOW);
+        new RipplePrint(parent, 4, 2, "Exit", 1, COLOR::RED);
     });
 
     WindowClass(&Windows, std_unit, 2, 1, 1, 3, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Select", 2);
+        new RipplePrint(parent, 2, 2, "Select", 1.5, COLOR::BLUE);
     });
 
     WindowClass(&Windows, std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Score");
+        new RipplePrint(parent, 2, 2, "Score", 0.7, COLOR::MAGENTA);
     });
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!

@@ -22,11 +22,12 @@ class RipplePrint
         WINDOW * win;
 
     public:
-        RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text, double _interval = -1, double _delay = 0.05, COLOR _color = COLOR::NORMAL);
+        RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text, double _interval = -1, COLOR _color = COLOR::NORMAL, double _delay = 0.05);
         std::chrono::_V2::system_clock::time_point getStartTime();
         int getX();
         int getY();
         std::string getText();
+        void setColor(COLOR _color);
         void eraseRipple();
         void restartRipple();
         void Update();

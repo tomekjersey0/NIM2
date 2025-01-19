@@ -1,7 +1,7 @@
 #include "RipplePrint.h"
 #include "WindowClass.h"
 
-RipplePrint::RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text,double _interval, double _delay, COLOR _color) :
+RipplePrint::RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text,double _interval, COLOR _color, double _delay) :
     parent(_parent),
     text(_text),
     x(_x),
@@ -40,11 +40,12 @@ std::string RipplePrint::getText() {
     return text;
 }
 
+void RipplePrint::setColor(COLOR _color) {
+    color = _color;
+}
+
 void RipplePrint::eraseRipple() {
-    std::string textBlank;
-    for (int i = 0; i < text.length(); i++) {
-        textBlank += " ";
-    }
+    std::string textBlank(text.length(), ' ');
     mvwprintw(win, y, x, textBlank.c_str());
 }
 
@@ -56,9 +57,12 @@ void RipplePrint::restartRipple() {
 }
 
 void RipplePrint::Update() {
+    wattron(win, COLOR_PAIR(color));
+
     auto now = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed = now - startTime;
     double elapsedSeconds = elapsed.count();
+
     if (elapsedSeconds >= delay && !done) {
         nowText += text[progress];
         mvwprintw(win, y, x, nowText.c_str());
@@ -75,6 +79,6 @@ void RipplePrint::Update() {
             restartRipple();
         }
     }
-}
-    mvwprintw(win, 1, 1, "%.2f", elapsedSeconds);
+
+    wattroff(win, COLOR_PAIR(color));
 }

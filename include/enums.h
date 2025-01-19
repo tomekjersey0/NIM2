@@ -9,7 +9,13 @@ enum MODE {
 enum COLOR {
     NORMAL = 1,
     SELECTED_MOVING = 2,
-    SELECTED_INTERACTING = 3
+    SELECTED_INTERACTING = 3,
+    RED = 4,
+    GREEN = 5,
+    BLUE = 6,
+    MAGENTA = 7,
+    CYAN = 8,
+    YELLOW = 9
 };
 
 #endif

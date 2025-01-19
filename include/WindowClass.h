@@ -13,7 +13,7 @@ class WindowClass {
     private:
         bool has_border, isShowing, isSelectable;
         int cur_w, cur_h, x, y, std_unit;
-        COLOR BorderColor;
+        COLOR BorderColor, ContentColor;
         WINDOW *win;
         void (*content)(WindowClass * win); // Proper function pointer declaration
         std::vector<RipplePrint*> Ripples;
@@ -25,6 +25,7 @@ class WindowClass {
         ~WindowClass();
         std::vector<RipplePrint*> getRipples();
         void setBorderColor(COLOR color);
+        void setContentColor(COLOR color);
         void AddRipple(RipplePrint* rip);
         WINDOW * getWindow();
         void InitWindow();
