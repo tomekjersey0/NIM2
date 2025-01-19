@@ -1,5 +1,5 @@
-#include "RipplePrint.h"
 #include "WindowClass.h"
+#include "RipplePrint.h"
 
 WindowClass::WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent),  bool isSelectable, bool isShowing, bool has_border) : 
     Windows(_Windows),
@@ -120,11 +120,9 @@ void WindowClass::Update() {
             box(win, 0, 0); // Draw border if needed
             wattroff(win, COLOR_PAIR(BorderColor));
         }
-
         for (auto rip : Ripples) {
             rip->Update();
         }
-
         wrefresh(win); // Refresh the window to update display
     }
 }

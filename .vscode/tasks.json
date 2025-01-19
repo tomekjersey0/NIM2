@@ -6,8 +6,8 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "-g",
-                "-Iinclude",                       // Enable debug symbols
+                "-g",                             // Enable debug symbols
+                "-Iinclude",
                 "src/*.cpp",
                 "-o",
                 "main",

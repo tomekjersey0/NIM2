@@ -188,7 +188,7 @@ void StartGame() {
                 mode = MODE::MOVING;
             }
         }
-
+      
         if (c == 'q') {
             gameOn = false;
         }
@@ -301,21 +301,20 @@ int main() {
     const int std_unit = 10;
 
     WindowClass(&Windows, std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, "Ts the Intro, Fool!", 1, 1);
+        new RipplePrint(parent, 2, 2, "Intro", 1);
     });
 
     WindowClass(&Windows, std_unit, 2, 3, 1, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, "Game! Yay!", 1, 1);
+        new RipplePrint(parent, 2, 2, "Game", 0.5);
     });
 
     WindowClass(&Windows, std_unit, 2, 1, 1, 3, [](WindowClass* parent) {
-        new RipplePrint(parent, "Select??", 1, 1);
+        new RipplePrint(parent, 2, 2, "Select", 2);
     });
 
     WindowClass(&Windows, std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, "Score ahh LOL", 1, 1);
+        new RipplePrint(parent, 2, 2, "Score");
     });
-    
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!
     // * Otherwise the windows will not be set and won't render!
