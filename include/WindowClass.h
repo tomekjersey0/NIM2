@@ -22,6 +22,7 @@ class WindowClass {
 
     public:
         WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true);
+        ~WindowClass();
         std::vector<RipplePrint*> getRipples();
         void setBorderColor(COLOR color);
         void AddRipple(RipplePrint* rip);

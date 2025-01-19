@@ -20,6 +20,11 @@ WindowClass::WindowClass(std::vector<WindowClass> * _Windows, const int _std_uni
     Windows->push_back(*this);
 }
 
+WindowClass::~WindowClass() {
+    for (RipplePrint * rip : Ripples) {
+        delete rip;
+    }
+}
 
 std::vector<RipplePrint*> WindowClass::getRipples() {
     return Ripples;
@@ -115,16 +120,9 @@ void WindowClass::Update() {
             box(win, 0, 0); // Draw border if needed
             wattroff(win, COLOR_PAIR(BorderColor));
         }
-        //auto now = std::chrono::system_clock::now();
-
         for (auto rip : Ripples) {
             rip->Update();
         }
-
-        //std::chrono::duration<double> elapsed2 = now - std::chrono::system_clock::now();
-        //double elapsedSeconds2 = elapsed2.count();
-        //mvwprintw(win, 1, 1, "all ripples time: %f seconds / ripple count: %d", elapsed2, Ripples.size());
-
         wrefresh(win); // Refresh the window to update display
     }
 }

@@ -59,7 +59,6 @@ void RipplePrint::Update() {
     auto now = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed = now - startTime;
     double elapsedSeconds = elapsed.count();
-
     if (elapsedSeconds >= delay && !done) {
         nowText += text[progress];
         mvwprintw(win, y, x, nowText.c_str());
@@ -76,4 +75,6 @@ void RipplePrint::Update() {
             restartRipple();
         }
     }
+}
+    mvwprintw(win, 1, 1, "%.2f", elapsedSeconds);
 }

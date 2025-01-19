@@ -31,5 +31,4 @@ class RipplePrint
         void restartRipple();
         void Update();
 };
-
 #endif

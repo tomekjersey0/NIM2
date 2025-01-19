@@ -180,12 +180,17 @@ void StartGame() {
             }
             MoveWindow(c, WindowLayoutC, cur_row, cur_col);
         } else
+
         // Interact with the window if the mode is different
         if (mode == MODE::INTERACTING) {
             // Press ESCAPE to exit to moving mode
             if (c == 27) {
                 mode = MODE::MOVING;
             }
+        }
+      
+        if (c == 'q') {
+            gameOn = false;
         }
 
         // Update selected
@@ -310,7 +315,6 @@ int main() {
     WindowClass(&Windows, std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
         new RipplePrint(parent, 2, 2, "Score");
     });
-
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!
     // * Otherwise the windows will not be set and won't render!
@@ -320,9 +324,6 @@ int main() {
     StartGame();
 
     getch();
-    for (int i = 0; i < Windows.size(); i++) {
-        delwin(Windows[i].getWindow());
-    }
     endwin();
     return 0;
 }
