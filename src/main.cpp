@@ -285,11 +285,11 @@ int main() {
 
     WindowClass(&Windows, 1, 4, 0, 0, [](WindowClass* parent) {
         new RipplePrint(parent, 2, 2, "Intro", 1, COLOR::RED);
-        new RippleList(parent, 2, 2, [](RippleList* parent) {
+        new RippleList(parent, 4, 3, [](RippleList* parent) {
             new RippleItem(parent, "Start", COLOR::GREEN);
             new RippleItem(parent, "Settings", COLOR::YELLOW);
             new RippleItem(parent, "Exit", COLOR::RED);
-        });
+        }, 2, ORIENTATION::VERTICAL);
     });
 
     WindowClass(&Windows, 2, 3, 1, 0, [](WindowClass* parent) {

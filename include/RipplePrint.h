@@ -28,7 +28,7 @@ class RipplePrint : public Ripple
         std::chrono::_V2::system_clock::time_point getStartTime();
         int getX();
         int getY();
-        std::string getText();
+        std::string GetText() override;
         void setColor(COLOR _color);
         void eraseRipple();
         void restartRipple();

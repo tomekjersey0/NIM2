@@ -12,13 +12,15 @@ class RippleItem : public Ripple {
         std::string text;
         COLOR color;
         RippleList * parent;
+        bool showing;
 
     public:
         RippleItem(RippleList * _parent, std::string _text, COLOR _color = COLOR::NORMAL);
+        void ShowRipple(bool show);
         void Update() override;
-        void SetX(int _x) { x = _x; };
-        void SetY(int _y) { y = _y; };
-        void getXY(int& _x, int& _y) { _x = x; _y = y; };
+        void SetX(int _x) override;
+        void SetY(int _y) override;
+        std::string GetText() override;
 };
 
 #endif

@@ -36,7 +36,7 @@ int RipplePrint::getY() {
     return y;
 }
 
-std::string RipplePrint::getText() {
+std::string RipplePrint::GetText() {
     return text;
 }
 
