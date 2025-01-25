@@ -4,12 +4,11 @@
 
 #include "Ripple.h"
 #include "RippleList.h"
+#include "Animation.h"
 #include "enums.h"
 
-class RippleItem : public Ripple {
+class RippleItem : public Ripple, public Animation {
     private:
-        int x, y;
-        std::string text;
         COLOR color;
         RippleList * parent;
         bool showing;

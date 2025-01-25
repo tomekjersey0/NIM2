@@ -4,6 +4,7 @@
 
 #include "enums.h"
 #include "Ripple.h"
+#include "Animation.h"
 
 #include <string>
 #include <chrono>
@@ -11,17 +12,11 @@
 
 class WindowClass;
 
-class RipplePrint : public Ripple
+class RipplePrint : public Ripple, public Animation
 {
     private:
-        std::string text, nowText;
-        int progress, x, y;
-        bool done, looping;
-        double delay, interval;
         COLOR color;
-        std::chrono::_V2::system_clock::time_point startTime, startAnimTime;
         WindowClass * parent;
-        WINDOW * win;
 
     public:
         RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text, double _interval = -1, COLOR _color = COLOR::NORMAL, double _delay = 0.05);
@@ -30,8 +25,6 @@ class RipplePrint : public Ripple
         int getY();
         std::string GetText() override;
         void setColor(COLOR _color);
-        void eraseRipple();
-        void restartRipple();
         void Update() override;
 };
 #endif
