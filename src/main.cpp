@@ -1,5 +1,7 @@
 #include "WindowClass.h"
 #include "RipplePrint.h"
+#include "RippleList.h"
+#include "RippleItem.h"
 
 void TimedErrorExit(std::string message, int countdownTime=3);
 void SetTerminalSize(std::vector<WindowClass>& Windows);
@@ -20,6 +22,7 @@ void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int
 
 void MoveWindow(int KEY_DIR, const std::vector<std::vector<int>>& WindowLayoutC, int& cur_row, int& cur_col, int& selected) {
     switch (KEY_DIR) {
+        case 'h':
         case KEY_LEFT:
             if (cur_col > 0) {
                 cur_col--;
@@ -27,6 +30,7 @@ void MoveWindow(int KEY_DIR, const std::vector<std::vector<int>>& WindowLayoutC,
                 cur_col = WindowLayoutC[cur_row].size() - 1; // Wrap to the last column
             }
             break;
+        case 'l':
         case KEY_RIGHT:
             if (cur_col < WindowLayoutC[cur_row].size() - 1) {
                 cur_col++;
@@ -34,7 +38,7 @@ void MoveWindow(int KEY_DIR, const std::vector<std::vector<int>>& WindowLayoutC,
                 cur_col = 0; // Wrap to the first column
             }
             break;
-
+        case 'k':
         case KEY_UP:
             if (cur_row > 0) {
                 cur_row--;
@@ -47,6 +51,7 @@ void MoveWindow(int KEY_DIR, const std::vector<std::vector<int>>& WindowLayoutC,
                 cur_col = WindowLayoutC[cur_row].size() - 1;
             }
             break;
+        case 'j':
         case KEY_DOWN:
             if (cur_row < WindowLayoutC.size() - 1) {
                 cur_row++;
@@ -278,23 +283,26 @@ int main() {
     // Not sure why or how this works, but it does, so that's that.
     resize_term(1000, 1000);
 
-    const int std_unit = 10;
-
-    WindowClass(&Windows, std_unit, 1, 4, 0, 0, [](WindowClass* parent) {
+    WindowClass(&Windows, 1, 4, 0, 0, [](WindowClass* parent) {
         new RipplePrint(parent, 2, 2, "Intro", 1, COLOR::RED);
+        new RippleList(parent, 2, 2, [](RippleList* parent) {
+            new RippleItem(parent, "Start", COLOR::GREEN);
+            new RippleItem(parent, "Settings", COLOR::YELLOW);
+            new RippleItem(parent, "Exit", COLOR::RED);
+        });
     });
 
-    WindowClass(&Windows, std_unit, 2, 3, 1, 0, [](WindowClass* parent) {
+    WindowClass(&Windows, 2, 3, 1, 0, [](WindowClass* parent) {
         new RipplePrint(parent, 2, 2, "Game", 2, COLOR::GREEN);
         new RipplePrint(parent, 3, 2, "Settings", 1.5, COLOR::YELLOW);
         new RipplePrint(parent, 4, 2, "Exit", 1, COLOR::RED);
     });
 
-    WindowClass(&Windows, std_unit, 2, 1, 1, 3, [](WindowClass* parent) {
+    WindowClass(&Windows, 2, 1, 1, 3, [](WindowClass* parent) {
         new RipplePrint(parent, 2, 2, "Select", 1.5, COLOR::BLUE);
     });
 
-    WindowClass(&Windows, std_unit, 1, 4, 3, 0, [](WindowClass* parent) {
+    WindowClass(&Windows, 1, 4, 3, 0, [](WindowClass* parent) {
         new RipplePrint(parent, 2, 2, "Score", 0.7, COLOR::MAGENTA);
     });
     // Sets size of terminal based on physical orientation of the windows in the Windows list

@@ -18,4 +18,12 @@ enum COLOR {
     YELLOW = 9
 };
 
+enum ORIENTATION {
+    VERTICAL, HORIZONTAL
+};
+
+enum CONSTS {
+    STD_UNIT = 10,
+};
+
 #endif

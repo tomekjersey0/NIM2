@@ -1,7 +1,8 @@
 #include "RipplePrint.h"
 #include "WindowClass.h"
 
-RipplePrint::RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text,double _interval, COLOR _color, double _delay) :
+RipplePrint::RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text, double _interval, COLOR _color, double _delay) :
+    Ripple(_parent),
     parent(_parent),
     text(_text),
     x(_x),
@@ -12,7 +13,6 @@ RipplePrint::RipplePrint(WindowClass * _parent, int _y, int _x, std::string _tex
 {
     startTime = std::chrono::system_clock::now();
     progress = 0;
-    parent->AddRipple(this);
     win = parent->getWindow();
     nowText = "";
     if (_interval < 0 /* so is -1 or bogus value*/) {

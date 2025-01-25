@@ -1,9 +1,9 @@
 #include "WindowClass.h"
-#include "RipplePrint.h"
+#include "Ripple.h"
 
-WindowClass::WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent),  bool isSelectable, bool isShowing, bool has_border) : 
+WindowClass::WindowClass(std::vector<WindowClass> * _Windows, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent),  bool isSelectable, bool isShowing, bool has_border) : 
     Windows(_Windows),
-    std_unit(_std_unit),
+    std_unit(CONSTS::STD_UNIT),
     y(_y),
     x(_x),
     has_border(has_border),
@@ -23,12 +23,12 @@ WindowClass::WindowClass(std::vector<WindowClass> * _Windows, const int _std_uni
 }
 
 WindowClass::~WindowClass() {
-    for (RipplePrint * rip : Ripples) {
+    for (Ripple * rip : Ripples) {
         delete rip;
     }
 }
 
-std::vector<RipplePrint*> WindowClass::getRipples() {
+std::vector<Ripple*> WindowClass::getRipples() {
     return Ripples;
 }
 
@@ -36,7 +36,7 @@ void WindowClass::setBorderColor(COLOR color) {
     BorderColor = color;
 }
 
-void WindowClass::AddRipple(RipplePrint* rip) {
+void WindowClass::AddRipple(Ripple* rip) {
     Ripples.push_back(rip);
 }
 

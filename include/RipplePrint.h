@@ -2,14 +2,16 @@
 #ifndef RIPPLEPRINT_H
 #define RIPPLEPRINT_H
 
-#include <string>
 #include "enums.h"
+#include "Ripple.h"
+
+#include <string>
 #include <chrono>
 #include <curses.h>
 
 class WindowClass;
 
-class RipplePrint 
+class RipplePrint : public Ripple
 {
     private:
         std::string text, nowText;
@@ -30,6 +32,6 @@ class RipplePrint
         void setColor(COLOR _color);
         void eraseRipple();
         void restartRipple();
-        void Update();
+        void Update() override;
 };
 #endif

@@ -7,7 +7,7 @@
 #include <iostream>
 #include "enums.h"
 
-class RipplePrint;
+class Ripple;
 
 class WindowClass {
     private:
@@ -16,17 +16,17 @@ class WindowClass {
         COLOR BorderColor, ContentColor;
         WINDOW *win;
         void (*content)(WindowClass * win); // Proper function pointer declaration
-        std::vector<RipplePrint*> Ripples;
+        std::vector<Ripple*> Ripples;
 
         std::vector<WindowClass> * Windows;
 
     public:
-        WindowClass(std::vector<WindowClass> * _Windows, const int _std_unit, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true);
+        WindowClass(std::vector<WindowClass> * _Windows, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent) = nullptr,  bool isSelectable = true, bool isShowing = true, bool has_border = true);
         ~WindowClass();
-        std::vector<RipplePrint*> getRipples();
+        std::vector<Ripple*> getRipples();
         void setBorderColor(COLOR color);
         void setContentColor(COLOR color);
-        void AddRipple(RipplePrint* rip);
+        void AddRipple(Ripple* rip);
         WINDOW * getWindow();
         void InitWindow();
         void Normalize(int x_offset, int y_offset);
