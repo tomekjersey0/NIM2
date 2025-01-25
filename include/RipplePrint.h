@@ -19,7 +19,7 @@ class RipplePrint : public Ripple
         bool done, looping;
         double delay, interval;
         COLOR color;
-        std::chrono::_V2::system_clock::time_point startTime;
+        std::chrono::_V2::system_clock::time_point startTime, startAnimTime;
         WindowClass * parent;
         WINDOW * win;
 

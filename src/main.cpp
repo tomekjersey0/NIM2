@@ -284,7 +284,7 @@ int main() {
     resize_term(1000, 1000);
 
     WindowClass(&Windows, 1, 4, 0, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Intro", 1, COLOR::RED);
+        new RipplePrint(parent, 2, 2, "Intro", 2, COLOR::RED);
         new RippleList(parent, 4, 3, [](RippleList* parent) {
             new RippleItem(parent, "Start", COLOR::GREEN);
             new RippleItem(parent, "Settings", COLOR::YELLOW);
@@ -294,16 +294,16 @@ int main() {
 
     WindowClass(&Windows, 2, 3, 1, 0, [](WindowClass* parent) {
         new RipplePrint(parent, 2, 2, "Game", 2, COLOR::GREEN);
-        new RipplePrint(parent, 3, 2, "Settings", 1.5, COLOR::YELLOW);
-        new RipplePrint(parent, 4, 2, "Exit", 1, COLOR::RED);
+        new RipplePrint(parent, 3, 2, "Settings", 2, COLOR::YELLOW);
+        new RipplePrint(parent, 4, 2, "Exit", 2, COLOR::RED);
     });
 
     WindowClass(&Windows, 2, 1, 1, 3, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Select", 1.5, COLOR::BLUE);
+        new RipplePrint(parent, 2, 2, "Select", 1.7, COLOR::BLUE);
     });
 
     WindowClass(&Windows, 1, 4, 3, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Score", 0.7, COLOR::MAGENTA);
+        new RipplePrint(parent, 2, 2, "Score", 1.7, COLOR::MAGENTA);
     });
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!

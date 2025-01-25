@@ -12,6 +12,8 @@ RipplePrint::RipplePrint(WindowClass * _parent, int _y, int _x, std::string _tex
     interval(_interval)
 {
     startTime = std::chrono::system_clock::now();
+    startAnimTime = std::chrono::system_clock::now();
+    done = false;
     progress = 0;
     win = parent->getWindow();
     nowText = "";
@@ -61,9 +63,11 @@ void RipplePrint::Update() {
 
     auto now = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed = now - startTime;
-    double elapsedSeconds = elapsed.count();
+    std::chrono::duration<double> elapsedAnim = now - startAnimTime;
+    double elapsedSecondsFromStartAnimation = elapsedAnim.count();
+    double elapsedSecondsFromLastCharacter = elapsed.count();
 
-    if (elapsedSeconds >= delay && !done) {
+    if (elapsedSecondsFromLastCharacter >= delay && !done) {
         nowText += text[progress];
         mvwprintw(win, y, x, nowText.c_str());
         startTime = std::chrono::system_clock::now();
@@ -75,8 +79,9 @@ void RipplePrint::Update() {
     }
 
     if (looping && done) {
-        if (elapsedSeconds >= interval) {
+        if (elapsedSecondsFromStartAnimation >= interval) {
             restartRipple();
+            startAnimTime = std::chrono::system_clock::now();
         }
     }
 
