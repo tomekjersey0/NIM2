@@ -27,7 +27,7 @@ void RippleList::SetItemPositions() {
         item->SetX(_x);
         item->SetY(_y);
         if (orientation == ORIENTATION::VERTICAL) {
-            _y += gap;
+            _y += gap + 1;
         } else {
             _x += gap + item->GetText().length();
         }

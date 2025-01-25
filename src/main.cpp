@@ -289,7 +289,7 @@ int main() {
             new RippleItem(parent, "Start", COLOR::MAGENTA);
             new RippleItem(parent, "Settings", COLOR::CYAN);
             new RippleItem(parent, "Exit", COLOR::RED);
-        }, 2, ORIENTATION::VERTICAL);
+        }, 1, ORIENTATION::HORIZONTAL);
     });
 
     WindowClass(&Windows, 2, 3, 1, 0, [](WindowClass* parent) {
@@ -299,11 +299,11 @@ int main() {
     });
 
     WindowClass(&Windows, 2, 1, 1, 3, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Select", 1.7, COLOR::BLUE);
+        new RipplePrint(parent, 2, 2, "Select", 3, COLOR::BLUE);
     });
 
     WindowClass(&Windows, 1, 4, 3, 0, [](WindowClass* parent) {
-        new RipplePrint(parent, 2, 2, "Score", 1.7, COLOR::MAGENTA);
+        new RipplePrint(parent, 2, 2, "Score", 3, COLOR::MAGENTA);
     });
     // Sets size of terminal based on physical orientation of the windows in the Windows list
     // * Make sure to run this method before refreshing any windows using this system!
