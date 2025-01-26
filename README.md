@@ -18,7 +18,8 @@ So far, not much, but I'll add them to this list as the project goes on
 * Test windows, with selectable windows that can be switched between
 * Super easy (and only getting easier) window management system
 * Windows can be switched between INTERACTING and MOVING modes (function of which to be implemented)
-* Added RipplePrint objects, with color and looping
+* RipplePrint objects, with color and looping
+* RippleLists and RippleItems, which support horizontal and vertical lists of ripples (selectability not yet implemented)
 
 <hr>
 
