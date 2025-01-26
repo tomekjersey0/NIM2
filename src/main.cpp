@@ -289,7 +289,7 @@ int main() {
             new RippleItem(parent, "Start", COLOR::MAGENTA);
             new RippleItem(parent, "Settings", COLOR::CYAN);
             new RippleItem(parent, "Exit", COLOR::RED);
-        }, 1, ORIENTATION::HORIZONTAL);
+        }, 2, ORIENTATION::HORIZONTAL);
     });
 
     WindowClass(&Windows, 2, 3, 1, 0, [](WindowClass* parent) {
