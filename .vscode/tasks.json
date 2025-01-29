@@ -11,7 +11,7 @@
                 "-Ienums",
                 "src/*.cpp",
                 "-o",
-                "main",
+                "bin/main",
                 "-lpdcurses"
             ],
             "group": {
