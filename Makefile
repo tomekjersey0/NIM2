@@ -8,17 +8,17 @@ DEBUG_DIR := bin/Debug
 RELEASE_DIR := bin/Release
 
 # Define targets
-all: build run
+all: clean build run
 
-release: $(RELEASE_DIR)/main
+release: $(RELEASE_DIR)/NimGame
 
 build: $(DEBUG_DIR)/main
 
-$(RELEASE_DIR)/main: $(SRC)
-	$(CXX) $(CXXFLAGS) $^ -o $@ lib/libpdcurses.a -static
+$(RELEASE_DIR)/NimGame: $(SRC)
+	$(CXX) $(CXXFLAGS) $^ -o $@ -Llib -lpdcurses -static
 
 $(DEBUG_DIR)/main: $(SRC)
-	$(CXX) $(CXXFLAGS) $^ -o $@ bin/pdcurses.dll
+	$(CXX) $(CXXFLAGS) $^ -o $@ -Lbin -lpdcurses
 
 run: $(DEBUG_DIR)/main
 	./$(DEBUG_DIR)/main
