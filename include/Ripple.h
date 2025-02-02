@@ -7,7 +7,8 @@
 class WindowClass;
 class RippleList;
 
-class Ripple {
+class Ripple 
+{
     private:
         WindowClass * parent;
         RippleList * parentList;

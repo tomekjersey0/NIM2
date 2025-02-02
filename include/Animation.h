@@ -6,7 +6,8 @@
 #include <chrono>
 #include <curses.h>
 
-class Animation {
+class Animation 
+{
     protected:
         int x, y;
         std::string text;

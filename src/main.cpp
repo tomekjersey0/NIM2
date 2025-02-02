@@ -2,12 +2,13 @@
 #include "RipplePrint.h"
 #include "RippleList.h"
 #include "RippleItem.h"
-
-void TimedErrorExit(std::string message, int countdownTime=3);
-void SetTerminalSize(std::vector<WindowClass>& Windows);
+#include "Game.h"
 
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
+
+void TimedErrorExit(std::string message, int countdownTime=3);
+void SetTerminalSize(std::vector<WindowClass>& Windows);
 
 void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int>> WindowLayoutC) {
     // Ensure row and col are within bounds
@@ -178,6 +179,18 @@ void StartGame() {
             refresh();
         }
 
+        // Handle key presses to update STD_UNIT and resize terminal
+        if (c == '+') {
+            Game::UpdateSTD_UNIT(1);
+            SetTerminalSize(Windows);
+            refresh();
+        }
+        if (c == '-') {
+            Game::UpdateSTD_UNIT(-1);
+            SetTerminalSize(Windows);
+            refresh();
+        }
+
         napms(10);
     }
 }
@@ -235,7 +248,6 @@ void SetTerminalSize(std::vector<WindowClass>& Windows) {
             window.InitWindow();
         }
     }
-
     resize_term(termHeight, termWidth);
 }
 
@@ -310,6 +322,7 @@ int main() {
     // * Otherwise the windows will not be set and won't render!
     // * Program will probably also crash!
     SetTerminalSize(Windows);
+    Game::InitializeGame(Windows, WindowLayout);
 
     StartGame();
 

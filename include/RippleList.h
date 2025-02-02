@@ -13,7 +13,8 @@
 
 class WindowClass;
 
-class RippleList : Ripple {
+class RippleList : Ripple 
+{
     private:
         int x, y, gap;
         WindowClass * parent;

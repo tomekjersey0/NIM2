@@ -7,7 +7,8 @@
 #include "Animation.h"
 #include "enums.h"
 
-class RippleItem : public Ripple, public Animation {
+class RippleItem : public Ripple, public Animation 
+{
     private:
         COLOR color;
         RippleList * parent;

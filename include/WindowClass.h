@@ -9,7 +9,8 @@
 
 class Ripple;
 
-class WindowClass {
+class WindowClass 
+{
     private:
         bool has_border, isShowing, isSelectable;
         int cur_w, cur_h, x, y, std_unit;

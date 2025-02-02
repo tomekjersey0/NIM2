@@ -22,8 +22,5 @@ enum ORIENTATION {
     VERTICAL, HORIZONTAL
 };
 
-enum CONSTS {
-    STD_UNIT = 10,
-};
 
 #endif

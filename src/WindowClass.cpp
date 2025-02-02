@@ -1,9 +1,10 @@
 #include "WindowClass.h"
 #include "Ripple.h"
+#include "Game.h"
 
 WindowClass::WindowClass(std::vector<WindowClass> * _Windows, int height, int width, int _y, int _x,  void (*_content)(WindowClass * parent),  bool isSelectable, bool isShowing, bool has_border) : 
     Windows(_Windows),
-    std_unit(CONSTS::STD_UNIT),
+    std_unit(Game::getSTD_UNIT()),
     y(_y),
     x(_x),
     has_border(has_border),
@@ -55,7 +56,11 @@ void WindowClass::InitWindow() {
         }
     }
     else {
-        std::cerr << "Window has already been initialized" << std::endl;
+        win = newwin(cur_h, cur_w, y, x);
+        //std::cerr << "Window has already been initialized" << std::endl;
+        if (content) {
+            content(this); // Function that adds all the objects to the be display to the window on initialization
+        }
     }
 }
 
@@ -64,15 +69,13 @@ void WindowClass::Normalize(int x_offset, int y_offset) {
     y -= y_offset;
 }
 
-void WindowClass::setSize(int height_stdunit, int width_stdunit) {
-    cur_h = height_stdunit * std_unit;
-    cur_w = width_stdunit * std_unit;
-    resize_window(win, cur_h, cur_w);
+void WindowClass::setSize(int height, int width) {
+    cur_h = height;
+    cur_w = width;
+    wresize(win, cur_h, cur_w);
 }
 
-void WindowClass::setPos (int x_stdunit, int y_stdunit) {
-    int _x = x_stdunit * std_unit;
-    int _y = y_stdunit * std_unit;
+void WindowClass::setPos(int _x, int _y) {
     if (mvwin(win, _y, _x) != ERR) {
         x = _x;
         y = _y;
