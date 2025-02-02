@@ -12,16 +12,16 @@ all: clean build run
 
 release: $(RELEASE_DIR)/NimGame
 
-build: $(DEBUG_DIR)/main
+build: $(DEBUG_DIR)/NimGame
 
 $(RELEASE_DIR)/NimGame: $(SRC)
-	$(CXX) $(CXXFLAGS) $^ -o $@ -Llib -lpdcurses -static
+	$(CXX) $(CXXFLAGS) $^ -o $@ -Llib -lpdcurses -static -static-libstdc++ -static-libgcc
 
-$(DEBUG_DIR)/main: $(SRC)
-	$(CXX) $(CXXFLAGS) $^ -o $@ -Lbin -lpdcurses
+$(DEBUG_DIR)/NimGame: $(SRC)
+	$(CXX) $(CXXFLAGS) $^ -o $@ -Llib -lpdcurses
 
-run: $(DEBUG_DIR)/main
-	./$(DEBUG_DIR)/main
+run: $(DEBUG_DIR)/NimGame
+	./$(DEBUG_DIR)/NimGame
 
 clean:
 	rm -rf $(DEBUG_DIR)/* $(RELEASE_DIR)/*

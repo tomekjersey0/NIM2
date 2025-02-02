@@ -11,7 +11,7 @@
                 "-Ienums",
                 "src/*.cpp",
                 "-o",
-                "bin/main",
+                "bin/Debug/NimGame",             // Output path
                 "-lpdcurses"
             ],
             "group": {

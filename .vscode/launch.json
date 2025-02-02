@@ -5,7 +5,7 @@
             "name": "Debug with GDB",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/main", // Path to your compiled program
+            "program": "${workspaceFolder}/bin/Debug/NimGame", // Path to your compiled program
             "args": [],                          // Optional: Arguments for your program
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -18,7 +18,7 @@ class Ripple {
         virtual void Update() = 0;
         virtual void SetX(int _x) {}
         virtual void SetY(int _y) {}
-        virtual std::string GetText() {};
+        virtual std::string GetText() {return "";};
 };
 
 #endif

@@ -32,37 +32,45 @@ and play with someone else on the internet. Will it be player hosted? Most likel
 
 <hr>
 
-### Advice for debugging
+## Debugging
 
-If you wanna debug, you're gonna need gdb for that, so get MSYS2, update it to the max with `pacman -Syu`,
-and install gdb. Make sure MSYS is fully updated, so be sure to run `pacman -Syu` a couple of times. Once its updated,
-run `pacman -S mingw-w64-x86_64-gdb` to install gdb onto your device. Now you can debug in vscode, bruh! (Make sure **not** to run `pacman -S gdb` as that would download the completely wrong version, and not only will it not work with this **launch.json**, it also won't even work in general. So do **NOT** run that command.)
-<br><br>
-Mate, then everything should realistically be perfect, leave the repo as it is, don't touch the .vscode folder, and get cracking.
-<br><br>
-Just make sure you've got the PDCurses libraries compiled and in the right
-MinGW folders, and have MinGW in your PATH.
-<br><br>
-To Debug, press F5 in vscode, and everything should work automatically. If I (or you, which could probably be me), find any issues 
-with the process, I'll add the workarounds here
+Best to use gdb (GNU Debugger)
+
+### Set Up
+1. Install MSYS2
+2. Update Repeatedly
+```
+pacman -Syu
+```
+3. Install gdb
+```
+pacman -S mingw-w64-x86_64-gdb
+```
+4. Ensure the .vscode folder it up to date, F5 to use
 
 <hr>
 
-### Advice for running the program
+## Usage
 
-Do I look like some 'running c++ files guru' to you? Come on mate, either install make with chocolatey and run 'make' in this directory, or go learn a thing or to about the harsh realities of learning things using your own time and effort in this world. Piss off!
-* `make build` to build...
-* `make run` to run...
-* `make [all]` to do it all!
-<br><br>
+### Prerequisites
+* make
+* mingw g++
+* C:\PathToBinFolderOfYourMakeInstallation\ in your path
+* C:\MinGW\bin (or wherever mingw/bin is on your device) in your path
 
-Before you do that however, you'll most certainly need go download `g++` from `mingw`, and the `pdcurses` library to your system.
-<br>
-* To get `mingw` and `g++`, just search for it on the internet, and install it on your computer.
-* To get `pdcurses`, clone the repo from github at <a href="https://github.com/wmcbrine/PDCurses">https://github.com/wmcbrine/PDCurses</a>, enter the *wincon* folder, do what is said to you in the *README.md*, and move the compiled `pducrses.a` file into the lib folder of your `mingw` installation, and copy `curses.h` from the folder above inside of your curses clone into the include directory (of `mingw`).
-* Make sure `mingw` is on your system PATH, by adding to it the path to the include, and bin directories, inside your environment variables settings.
-* `mingw` likes its library files to start with the prefix `lib`, so you might want to covert the name of the .a file to `libpdcurses.a` before trying to use it.
-* After all this, running make to compile the source code should be nice and easy and doable
+
+### Execution / Development
+make commands include:
+* `make build` compiles a debug executable using *pdcurses.dll* in the *bin* directory
+* `make run` compiles and runs a new debug version
+* `make clean` cleans the *bin* directory
+* `make all` combines clean, build and run
+* `make release` compiles a release build that can run outside of the project
+
+*IMPORTANT*
+*These commands only work when being run from git bash!*
+
+**All external libraries required by the program are already included in this project**
 
 Good Luck
 
