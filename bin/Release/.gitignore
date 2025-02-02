@@ -1,3 +1,4 @@
 # placeholder to keep the directory in the repository
 *.*
 !.gitignore
+!runNim.bat
