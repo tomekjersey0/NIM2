@@ -19,7 +19,7 @@ pre:
 	@if [ -z "$$(which g++ 2>/dev/null)" ]; then \
 		echo "g++ is not in your PATH. Add this to your ~/.bashrc:"; \
 		echo 'export PATH=/c/MinGW/bin:$$PATH'; \
-		echo 'You may have to restart your terminal.' \ 
+		echo 'You may have to restart your terminal.'; \
 		exit 1; \
 	fi
 
