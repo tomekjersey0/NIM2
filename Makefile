@@ -19,7 +19,7 @@ pre:
 	@if [ -z "$$(which g++ 2>/dev/null)" ]; then \
 		echo "g++ is not in your PATH. Add this to your ~/.bashrc:"; \
 		echo 'export PATH=/c/MinGW/bin:$$PATH'; \
-		echo 'You may have to restart your terminal.' \@make
+		echo 'You may have to restart your terminal.' \ 
 		exit 1; \
 	fi
 
@@ -61,6 +61,6 @@ run: $(DEBUG_DIR)/NimGame
 	./$(DEBUG_DIR)/NimGame
 
 # Clean
-clean _:
+clean:
 	@echo "Cleaning up"
 	@rm -rf $(OBJ_DIR_DEBUG)/*.o $(OBJ_DIR_RELEASE)/*.o $(DEBUG_DIR)/NimGame $(RELEASE_DIR)/NimGame
