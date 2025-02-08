@@ -1,0 +1,2 @@
+`nv:Path += ";C:\\MinGW\\bin"
+`$env:Path += ";C:\\MinGW\\bin"

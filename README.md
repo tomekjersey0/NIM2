@@ -74,14 +74,15 @@ pacman -S mingw-w64-x86_64-gdb
 
 ### Execution / Development
 make commands include:
-* `make build` compiles a debug executable using *pdcurses.dll* in the *bin* directory
+* `make build` compiles a dll dependant executable
 * `make run` compiles and runs a new debug version
-* `make clean` cleans the *bin* directory
+* `make clean` deletes all exeutables and removes all previously compiled objs
 * `make all` combines clean, build and run
-* `make release` compiles a release build that can run outside of the project
+* `make release` compiles self contained optimized executable
 
-*IMPORTANT*
-*These commands only work when being run from git bash!*
+To run with:
+    Git-bash -> `make -f Makefile [command]`
+    Powershell -> `make -f Makefile-ps [command]`
 
 **All external libraries required by the program are already included in this project**
 
