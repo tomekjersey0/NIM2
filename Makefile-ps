@@ -23,11 +23,8 @@ pre:
 	@powershell -NoProfile -ExecutionPolicy Bypass -Command \
 	"if (-not (Get-Command g++ -ErrorAction SilentlyContinue)) { \
 		Write-Host 'g++ is not in your PATH. Try running:'; \
-		Write-Host '$$env:Path += \";C:\MinGW\bin\"' \
+		Write-Host '$$env:PATH += \";C:\MinGW\bin\"' \
 	}"
-
-
-
 
 # Define targets
 all: clean build run
