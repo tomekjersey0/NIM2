@@ -9,6 +9,7 @@
                 "-g",                             // Enable debug symbols
                 "-Iinclude",
                 "-Ienums",
+                "-Lbin/Debug",
                 "src/*.cpp",
                 "-o",
                 "bin/Debug/NimGame",             // Output path
