@@ -5,6 +5,14 @@ LDFLAGS := -lpdcurses
 DEB_LDFLAGS := -Lbin/Debug
 REL_LDFLAGS := -Llib
 
+# Detect platform and set appropriate LDFLAGS
+ifeq ($(OS),Windows_NT)
+    LDFLAGS := -lpdcurses
+else
+    LDFLAGS := -lncurses
+endif
+
+
 # Define source files and output directories
 SRC := $(wildcard src/*.cpp)
 OBJ_DEBUG := $(patsubst src/%.cpp, obj/Debug/%.o, $(SRC))

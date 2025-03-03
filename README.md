@@ -86,6 +86,13 @@ To run with:
 
 **All external libraries required by the program are already included in this project**
 
+### LINUX
+
+You're gonna need ncurses for this, so if you're on debian, make sure to run:<br>
+```sudo apt install libncurses5-dev```
+before you start<br>
+Awesome!<br>
+
 Good Luck
 
 
