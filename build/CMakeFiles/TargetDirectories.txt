@@ -1,0 +1,3 @@
+C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build/CMakeFiles/NIM2.dir
+C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build/CMakeFiles/edit_cache.dir
+C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build/CMakeFiles/rebuild_cache.dir

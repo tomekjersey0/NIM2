@@ -1,0 +1,50 @@
+[
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/Animation.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/Animation.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/Animation.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/Animation.cpp.obj"
+},
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/Game.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/Game.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/Game.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/Game.cpp.obj"
+},
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/Ripple.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/Ripple.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/Ripple.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/Ripple.cpp.obj"
+},
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/RippleItem.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/RippleItem.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/RippleItem.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/RippleItem.cpp.obj"
+},
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/RippleList.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/RippleList.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/RippleList.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/RippleList.cpp.obj"
+},
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/RipplePrint.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/RipplePrint.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/RipplePrint.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/RipplePrint.cpp.obj"
+},
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/WindowClass.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/WindowClass.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/WindowClass.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/WindowClass.cpp.obj"
+},
+{
+  "directory": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/build",
+  "command": "C:/MinGW/bin/g++.exe  @CMakeFiles/NIM2.dir/includes_CXX.rsp -g -std=gnu++1z -o CMakeFiles/NIM2.dir/src/main.cpp.obj -c \"C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/main.cpp\"",
+  "file": "C:/Users/User/OneDrive/Documents/C and C++/C++/NIM2/src/main.cpp",
+  "output": "CMakeFiles/NIM2.dir/src/main.cpp.obj"
+}
+]
