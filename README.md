@@ -1,7 +1,5 @@
 # NIM2
 
-> The multiplayer NIM game that had to be made.
-
 ---
 
 ## 🎮 How to Play
@@ -24,21 +22,9 @@
 
 ## 📜 Lore
 
-Long ago, I played Twenty-One with Leah Cannard. She beat me many times. Each loss only fueled my obsession — how could I win?
-
-Eventually, I caved and searched for the strategy: **go second and say multiples of four.** The game was solved. But while searching, I stumbled across something else.
-
-A new game.
-
-At first, I thought little of it. But something about its structure, its mechanics, its *vibe*... pulled me back. I studied it, practiced it, mastered it. I played with friends, strangers, family. I needed more.
-
-But online? **Nothing.**
-
-So I decided: *If no one else will make the multiplayer version, I will.*
-
-And that game?
-
-It goes by the name of:
+###### Long ago, I played twenty-one with Leah Cannard. She beat me many times, with each attempted game and loss, my grit growing stronger on its mission to discover how on earth I was supposed to win. After some time, I finally broke down and looked up the strategy for winning so frustratingly often. Quite simply, it was always to go second and say multiples of four; the game was solved. Upon searching for this game, of twenty-one, I stumbled upon a different game.
+ ###### I didn't think much about this game, but the thought of its puzzling pieces intrigued me. Days later, I returned to the article I first spotted it on, and sought to learn the art of this game. So I did. I practiced long and hard, and before long nobody could live up to me in my mastery of the game. I played every one I could: went out at night to meet people I didn't know; played on call with people I've barely met; and showed the game to my family, and my closest friends. But after a while, it wasn't enough; I needed more. So I set to the internet once again to find any sort of multiplayer version of the game I could find - There was none. And so my task became clear, and it arose: I must create the multiplayer version, for there is none, and there must be.
+ ###### What is the name of this wondrous game, you may ask? <br>It goes by the name of:
 
 ## ✨ NIM2
 
@@ -57,19 +43,21 @@ It goes by the name of:
 
 ## 🛠️ Current Features
 
-- Test windows with selectable focus
-- Easy window management system
-- Switchable `INTERACTING` and `MOVING` modes (WIP)
-- `RipplePrint` objects (color, looping)
-- `RippleLists` & `RippleItems` (vertical & horizontal support)
+So far, not much, but I'll add them to this list as the project goes on
+ * Test windows, with selectable windows that can be switched between
+ * Super easy (and only getting easier) window management system
+ * Windows can be switched between INTERACTING and MOVING modes (function of which to be implemented)
+ * RipplePrint objects, with color and looping
+ * RippleLists and RippleItems, which support horizontal and vertical lists of ripples (selectability not yet implemented)
 
 ---
 
 ## 🚧 Planned Features
 
-- Online multiplayer  
-- Simple download & play experience  
-- Likely peer-to-peer hosting (no one's cheating in NIM anyway)
+From when I was looking online, there didn't seem to be any functional multiplayer online versions of NIM for people to play,
+ so my goal is to eventually make it possible to easily download this game as an app (probably just on computers for now),
+ and play with someone else on the internet. Will it be player hosted? Most likely, as long as I figure out a good way to do that.
+ (No ones gonna cheat in Nim of all things, anyway. )
 
 ---
 
@@ -102,3 +90,17 @@ rmdir /S /Q build   # Windows
 rm -rf build         # Linux/macOS
 ```
 ## 🐛 Debugging (Windows)
+
+ Best to use gdb (GNU Debugger)
+ 
+ ### Set Up
+ 1. Install MSYS2
+ 2. Update Repeatedly
+ ```
+ pacman -Syu
+ ```
+ 3. Install gdb
+ ```
+ pacman -S mingw-w64-x86_64-gdb
+ ```
+ 4. Ensure the .vscode folder it up to date, F5 to use
