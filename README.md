@@ -68,39 +68,80 @@ From when I was looking online, there didn't seem to be any functional multiplay
 - CMake
 - MinGW (with `g++`)
 - `cmake` and `g++.exe` in your `PATH`
+- vcpkg
 
-### Build & Run
+### Install vcpkg
 
+#### On Windows:
+1. Clone the vcpkg repository:
+   ```bash
+   git clone https://github.com/microsoft/vcpkg.git
+   cd vcpkg
+   ```
+2. Bootstrap vcpkg
+```bash
+bootstrap-vcpkg.bat
+```
+3. Add vcpkg to your system `PATH` (optional):
+- Add the path to the `vcpkg` executable (e.g., `C:/vcpkg`) to your system's `PATH.`
+
+#### On Linux:
+1. Clone the vcpkg repository:
+    ```bash
+    git clone https://github.com/microsoft/vcpkg.git
+    cd vcpkg
+    ```
+2. Bootstrap vcpkg
+```bash
+./bootstrap-vcpkg.sh
+```
+3. Add vcpkg to your shell's `PATH` (optional):
+```bash
+export PATH=$PATH:/path/to/vcpkg
+```
+Install Dependencies<br>
+Install the required libraries using vcpkg:
+```bash
+vcpkg install pdcurses ncurses
+```
+Integrate vcpkg with CMake<br>
+Run the following command to integrate vcpkg with CMake:
+```bash
+vcpkg integrate install
+```
+<hr>
+Build & Run<br>
 From the project root:
 
 ```bash
-cmake -S . -B build -G "MinGW Makefiles"
+cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 cmake --build build
 ./build/NIM2.exe
 ```
-For a release version
+For a release version:
 ```bash
-cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
 cmake --build build --config Release
 ./build/NIM2.exe
 ```
-To clean the build
+
+To clean the build:
 ```bash
 rmdir /S /Q build   # Windows
 rm -rf build         # Linux/macOS
 ```
-## 🐛 Debugging (Windows)
+<hr>
 
- Best to use gdb (GNU Debugger)
- 
- ### Set Up
- 1. Install MSYS2
- 2. Update Repeatedly
- ```
- pacman -Syu
- ```
- 3. Install gdb
- ```
- pacman -S mingw-w64-x86_64-gdb
- ```
- 4. Ensure the .vscode folder it up to date, F5 to use
+### 🐛 Debugging (Windows)
+
+Set Up
+1. Install MSYS2
+2. Update Repeatedly:
+```bash
+pacman -Syu
+```
+3. Install gdb:
+```bash
+pacman -S mingw-w64-x86_64-gdb
+```
+4. Ensure the `.vscode` folder is up to date, then press `F5` to debug.

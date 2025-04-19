@@ -17,9 +17,26 @@ include_directories(include enums)
 # Add the executable
 add_executable(NIM2 ${SOURCES} ${HEADERS})
 
-# Link platform-specific libraries
+# Find and link platform-specific libraries
 if(WIN32)
-    target_link_libraries(NIM2 PDCurses) # Use PDCurses on Windows
+    # Try to find PDCurses via vcpkg or custom paths
+    find_path(PDCURSES_INCLUDE_DIR curses.h PATH_SUFFIXES pdcurses)
+    find_library(PDCURSES_LIBRARY pdcurses)
+
+    # If not found, allow the user to specify custom paths
+    if(NOT PDCURSES_INCLUDE_DIR OR NOT PDCURSES_LIBRARY)
+        message(WARNING "PDCurses not found! Please specify PDCURSES_INCLUDE_DIR and PDCURSES_LIBRARY manually.")
+        set(PDCURSES_INCLUDE_DIR "" CACHE PATH "Path to PDCurses include directory")
+        set(PDCURSES_LIBRARY "" CACHE FILEPATH "Path to PDCurses library")
+    endif()
+
+    # Add include directory and link library
+    target_include_directories(NIM2 PRIVATE ${PDCURSES_INCLUDE_DIR})
+    target_link_libraries(NIM2 PRIVATE ${PDCURSES_LIBRARY})
 elseif(UNIX)
-    target_link_libraries(NIM2 ncurses) # Use ncurses on Linux
+    # Try to find ncurses via vcpkg or system package manager
+    find_package(ncurses REQUIRED CONFIG)
+
+    # Link ncurses
+    target_link_libraries(NIM2 PRIVATE ncurses::ncurses)
 endif()
