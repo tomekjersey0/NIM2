@@ -73,6 +73,7 @@ From when I was looking online, there didn't seem to be any functional multiplay
 ### Install vcpkg
 
 #### On Windows:
+Whilst in your `C:/` Drive
 1. Clone the vcpkg repository:
 ```bash
 git clone https://github.com/microsoft/vcpkg.git
@@ -86,6 +87,7 @@ bootstrap-vcpkg.bat
 - Add the path to the `vcpkg` executable (e.g., `C:/vcpkg`) to your system's `PATH.`
 
 #### On Linux:
+Whilst in your ~ home directory
 1. Clone the vcpkg repository:
 ```bash
 git clone https://github.com/microsoft/vcpkg.git
@@ -96,8 +98,13 @@ cd vcpkg
 ./bootstrap-vcpkg.sh
 ```
 3. Add vcpkg to your shell's `PATH` (optional):
+   Edit ~/.bashrc and add this line at the bottom of the file
 ```bash
-export PATH=$PATH:/path/to/vcpkg
+export PATH="$PATH:~/vcpkg"
+```
+4. Re-open your shell or run:
+```bash
+source ~/.bashrc
 ```
 Install Dependencies<br>
 Install the required libraries using vcpkg:
