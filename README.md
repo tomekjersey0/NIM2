@@ -106,18 +106,19 @@ export PATH="$PATH:~/vcpkg"
 ```bash
 source ~/.bashrc
 ```
-Install Dependencies<br>
+### Install Dependencies
 Install the required libraries using vcpkg:
 ```bash
 vcpkg install pdcurses ncurses
 ```
-Integrate vcpkg with CMake<br>
+### Integrate vcpkg with CMake
 Run the following command to integrate vcpkg with CMake:
 ```bash
 vcpkg integrate install
 ```
 <hr>
-Build & Run<br>
+
+### Build & Run
 From the project root:
 
 ```bash
