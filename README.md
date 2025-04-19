@@ -74,10 +74,10 @@ From when I was looking online, there didn't seem to be any functional multiplay
 
 #### On Windows:
 1. Clone the vcpkg repository:
-   ```bash
-   git clone https://github.com/microsoft/vcpkg.git
-   cd vcpkg
-   ```
+```bash
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+```
 2. Bootstrap vcpkg
 ```bash
 bootstrap-vcpkg.bat
@@ -87,10 +87,10 @@ bootstrap-vcpkg.bat
 
 #### On Linux:
 1. Clone the vcpkg repository:
-    ```bash
-    git clone https://github.com/microsoft/vcpkg.git
-    cd vcpkg
-    ```
+```bash
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+```
 2. Bootstrap vcpkg
 ```bash
 ./bootstrap-vcpkg.sh
