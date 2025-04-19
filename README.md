@@ -73,11 +73,12 @@ From when I was looking online, there didn't seem to be any functional multiplay
 ### Install vcpkg
 
 #### On Windows:
+Whilst in your `C:/` Drive
 1. Clone the vcpkg repository:
-   ```bash
-   git clone https://github.com/microsoft/vcpkg.git
-   cd vcpkg
-   ```
+```bash
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+```
 2. Bootstrap vcpkg
 ```bash
 bootstrap-vcpkg.bat
