@@ -86,43 +86,28 @@ bootstrap-vcpkg.bat
 - Add the path to the `vcpkg` executable (e.g., `C:/vcpkg`) to your system's `PATH.`
 
 #### On Linux:
-1. Clone the vcpkg repository:
-    ```bash
-    git clone https://github.com/microsoft/vcpkg.git
-    cd vcpkg
-    ```
-2. Bootstrap vcpkg
+Don't use vcpkg as it's seems to have trouble on linux. Instead install ncurses natively:
+1. Install `ncurses`:
 ```bash
-./bootstrap-vcpkg.sh
+sudo apt install libncurses5-dev libncursesw5-dev
 ```
-3. Add vcpkg to your shell's `PATH` (optional):
-```bash
-export PATH=$PATH:/path/to/vcpkg
-```
-Install Dependencies<br>
-Install the required libraries using vcpkg:
-```bash
-vcpkg install pdcurses ncurses
-```
-Integrate vcpkg with CMake<br>
-Run the following command to integrate vcpkg with CMake:
-```bash
-vcpkg integrate install
-```
+
 <hr>
-Build & Run<br>
+
+### Build & Run
 From the project root:
 
+#### Windows
 ```bash
 cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
 cmake --build build
-./build/NIM2.exe
 ```
 For a release version:
 ```bash
 cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
 cmake --build build --config Release
-./build/NIM2.exe
 ```
 
 To clean the build:

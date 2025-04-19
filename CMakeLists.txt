@@ -35,8 +35,9 @@ if(WIN32)
     target_link_libraries(NIM2 PRIVATE ${PDCURSES_LIBRARY})
 elseif(UNIX)
     # Try to find ncurses via vcpkg or system package manager
-    find_package(ncurses REQUIRED CONFIG)
+    find_package(Curses REQUIRED)
 
-    # Link ncurses
-    target_link_libraries(NIM2 PRIVATE ncurses::ncurses)
+    # Add include directory and link library
+    target_include_directories(NIM2 PRIVATE ${CURSES_INCLUDE_DIR})
+    target_link_libraries(NIM2 PRIVATE ${CURSES_LIBRARIES})
 endif()
