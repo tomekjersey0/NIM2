@@ -1,5 +1,4 @@
-# Minimum CMake version required
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 
 # Project name and version
 project(NIM2 VERSION 1.0)
@@ -8,16 +7,19 @@ project(NIM2 VERSION 1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Add the executable
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-add_executable(NIM2 ${SOURCES})
+# Automatically gather all source and header files
+file(GLOB SOURCES "src/*.cpp")
+file(GLOB HEADERS "include/*.h" "enums/*.h")
 
 # Include directories
-target_include_directories(NIM2 PRIVATE "include/" "enums/")
+include_directories(include enums)
 
-# Link libraries based on platform
+# Add the executable
+add_executable(NIM2 ${SOURCES} ${HEADERS})
+
+# Link platform-specific libraries
 if(WIN32)
-    target_link_libraries(NIM2 PRIVATE pdcurses)
-else()
-    target_link_libraries(NIM2 PRIVATE ncurses)
+    target_link_libraries(NIM2 PDCurses) # Use PDCurses on Windows
+elseif(UNIX)
+    target_link_libraries(NIM2 ncurses) # Use ncurses on Linux
 endif()
