@@ -70,6 +70,15 @@ From when I was looking online, there didn't seem to be any functional multiplay
 - `cmake` and `g++.exe` in your `PATH`
 - vcpkg
 
+### All Linux Users
+
+If you want to make sure you have all the correct packages installed to compile the program, just run:
+```bash
+chmod +x linux_prereq.sh
+./linux_prereq.sh
+```
+Then you can compile with cmake in the steps laid out later
+
 ### Install vcpkg
 
 #### On Windows:
@@ -98,12 +107,6 @@ vcpkg install unofficial-pdcurses:x64-mingw-dynamic
 ```
 For a dynamic build.
 It has to be done this way as official MSVC packages do not support MinGW build systems.
-
-#### Linux
-Install ncurses natively
-```bash
-sudo apt install libncurses5-dev libncursesw5-dev
-```
 
 <hr>
 
@@ -140,6 +143,19 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-mingw-
 ```
 
 #### Linux
+Build with:
+```bash
+cmake -S . -B build
+```
+Compile:
+```bash
+cmake --build build
+```
+Run:
+```bash
+./build/NIM2
+```
+
 
 To clean the build:
 ```bash
