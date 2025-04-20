@@ -19,7 +19,7 @@ add_executable(NIM2 ${SOURCES} ${HEADERS})
 
 # Ensure the toolchain file is set
 if(NOT CMAKE_TOOLCHAIN_FILE)
-    message(WARNING "CMAKE_TOOLCHAIN_FILE is not set. Make sure to set it globally or pass it during configuration.")
+    message(WARNING "CMAKE_TOOLCHAIN_FILE is not set. Make sure to set it globally or pass it during configuration. ONLY APPLIES TO WINDOWS")
 endif()
 
 # Find and link platform-specific libraries
