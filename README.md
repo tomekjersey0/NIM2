@@ -87,8 +87,20 @@ bootstrap-vcpkg.bat
 - Add the path to the `vcpkg` executable (e.g., `C:/vcpkg`) to your system's `PATH.`
 
 #### On Linux:
-Don't use vcpkg as it's seems to have trouble on linux. Instead install ncurses natively:
-1. Install `ncurses`:
+Don't use vcpkg as it's seems to have trouble on linux.
+
+### Install packages
+
+#### Windows
+The best installment of PDCurses using MinGW is the `unofficial-pdcurses package` which can be installed with:
+```bash
+vcpkg install unofficial-pdcurses:x64-mingw-dynamic
+```
+For a dynamic build.
+It has to be done this way as official MSVC packages do not support MinGW build systems.
+
+#### Linux
+Install ncurses natively
 ```bash
 sudo apt install libncurses5-dev libncursesw5-dev
 ```
@@ -99,17 +111,35 @@ sudo apt install libncurses5-dev libncursesw5-dev
 From the project root:
 
 #### Windows
+Either specify the correct path to your vcpkg.cmake file, or set the system variable `CMAKE_TOOLCHAIN_FILE` to the actual path to it.
+Also, you don't have to specify `-G "MinGW Makefiles"` if you set it as your default generator and then reload your terminal by setting the system variable `CMAKE_GENERATOR` to `MinGW Makefiles`.
+
+##### For a normal version
+No system variables build:
 ```bash
-cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic
 
 cmake --build build
 ```
-For a release version:
+Minimal build:
 ```bash
-cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake -S . -B build
+```
+
+##### For a release version:
+No system variables build
+```bash
+cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-static
 
 cmake --build build --config Release
 ```
+
+Minimal build:
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-mingw-static
+```
+
+#### Linux
 
 To clean the build:
 ```bash
