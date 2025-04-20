@@ -176,4 +176,8 @@ pacman -Syu
 ```bash
 pacman -S mingw-w64-x86_64-gdb
 ```
-4. Ensure the `.vscode` folder is up to date, then press `F5` to debug.
+4. When generating the build files, make sure to include the `-DCMAKE_BUILD_TYPE=Debug` flag, to ensure it works. For example:
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+```
+5. Ensure the `.vscode` folder is up to date, then press `F5` to debug.
