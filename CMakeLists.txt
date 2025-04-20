@@ -11,33 +11,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 file(GLOB SOURCES "src/*.cpp")
 file(GLOB HEADERS "include/*.h" "enums/*.h")
 
-# Include directories
-include_directories(include enums)
+# Add include directories
+include_directories(include enums src)
 
 # Add the executable
 add_executable(NIM2 ${SOURCES} ${HEADERS})
 
+# Ensure the toolchain file is set
+if(NOT CMAKE_TOOLCHAIN_FILE)
+    message(WARNING "CMAKE_TOOLCHAIN_FILE is not set. Make sure to set it globally or pass it during configuration.")
+endif()
+
 # Find and link platform-specific libraries
 if(WIN32)
-    # Try to find PDCurses via vcpkg or custom paths
-    find_path(PDCURSES_INCLUDE_DIR curses.h PATH_SUFFIXES pdcurses)
-    find_library(PDCURSES_LIBRARY pdcurses)
-
-    # If not found, allow the user to specify custom paths
-    if(NOT PDCURSES_INCLUDE_DIR OR NOT PDCURSES_LIBRARY)
-        message(WARNING "PDCurses not found! Please specify PDCURSES_INCLUDE_DIR and PDCURSES_LIBRARY manually.")
-        set(PDCURSES_INCLUDE_DIR "" CACHE PATH "Path to PDCurses include directory")
-        set(PDCURSES_LIBRARY "" CACHE FILEPATH "Path to PDCurses library")
-    endif()
-
-    # Add include directory and link library
-    target_include_directories(NIM2 PRIVATE ${PDCURSES_INCLUDE_DIR})
-    target_link_libraries(NIM2 PRIVATE ${PDCURSES_LIBRARY})
+    # Use vcpkg-provided target for PDCurses (unofficial-pdcurses for MinGW)
+    find_package(unofficial-pdcurses CONFIG REQUIRED)
+    target_link_libraries(NIM2 PRIVATE unofficial::pdcurses::pdcurses)
 elseif(UNIX)
-    # Try to find ncurses via vcpkg or system package manager
+    # Use ncurses on Linux
     find_package(Curses REQUIRED)
-
-    # Add include directory and link library
-    target_include_directories(NIM2 PRIVATE ${CURSES_INCLUDE_DIR})
     target_link_libraries(NIM2 PRIVATE ${CURSES_LIBRARIES})
 endif()
