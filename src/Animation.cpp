@@ -67,5 +67,9 @@ void Animation::Animate() {
             restartRipple();
             startAnimTime = std::chrono::system_clock::now();
         }
+        else {
+            mvwprintw(win, y, x, "%s", nowText.c_str());
+            refresh();
+        }
     }
 }

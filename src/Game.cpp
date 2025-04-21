@@ -1,6 +1,10 @@
 #include "Game.h"
 #include "WindowClass.h"
-#include <sys/ioctl.h>
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <sys/ioctl.h>
+#endif
 #include <unistd.h>
 
 int Game::STD_UNIT = 10;

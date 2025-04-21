@@ -3,10 +3,13 @@
 #include "RippleList.h"
 #include "RippleItem.h"
 #include "Game.h"
+#include "memoryTrack.h"
 #include <csignal>
+#include <chrono>
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
 
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
@@ -185,27 +188,32 @@ void StartGame() {
             refresh();
             resizeRequested = false;
         }
-
         // Handle key presses to update STD_UNIT and resize terminal
         if (c == '+') {
             Game::UpdateSTD_UNIT(1);
             SetTerminalSize(Windows);
-            refresh();
         }
         if (c == '-') {
             Game::UpdateSTD_UNIT(-1);
             SetTerminalSize(Windows);
-            refresh();
+            Game::setJustResized(true);
         }
         
         Game::getPhysicalTerminalSize(cur_row, cur_col);
-        mvprintw(1, 1, "Terminal size: %d rows, %d cols\n", cur_row, cur_col);
-        mvprintw(2, 1, "Terminal size: %d rows, %d cols\n", Game::getTERMINAL_HEIGHT(), Game::getTERMINAL_WIDTH());
-        
         if (cur_row != Game::getTERMINAL_HEIGHT() || cur_col != Game::getTERMINAL_WIDTH()) {
             Game::resetStoredTerminalSize();
             resizeRequested = true;
         }
+
+        // Print memory usage
+        long memUsage = getMemoryUsageKB();
+        if (memUsage != -1) {
+            mvprintw(1, 1,"Memory Usage: %ld KB", memUsage);
+        } else {
+            mvprintw(2, 1, "Error retrieving memory usage");
+        }
+
+        mvprintw(2, 1, "Ripples for window[0]: %d", Windows[0].getRippleCount());
 
         refresh();
 

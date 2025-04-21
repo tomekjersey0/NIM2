@@ -56,11 +56,16 @@ void WindowClass::InitWindow() {
         }
     }
     else {
-        win = newwin(cur_h, cur_w, y, x);
+        werase(win);
+        // win = newwin(cur_h, cur_w, y, x);
         //std::cerr << "Window has already been initialized" << std::endl;
+
+
+        /*
         if (content) {
             content(this); // Function that adds all the objects to the be display to the window on initialization
         }
+        */
     }
 }
 
