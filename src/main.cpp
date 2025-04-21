@@ -6,6 +6,10 @@
 #include <csignal>
 #include <cstdio>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
 volatile bool resizeRequested = false;
@@ -13,10 +17,32 @@ volatile bool resizeRequested = false;
 void TimedErrorExit(std::string message, int countdownTime=3);
 void SetTerminalSize(std::vector<WindowClass>& Windows);
 
+#ifdef _WIN32
+void HandleResize() {
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
+        int cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+        int rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+        // Update terminal size or handle resizing logic here
+        resize_term(rows, cols);
+    }
+}
+#else
 void HandleResize(int sig) {
     resizeRequested = true;
-    printw("Recieved SIGWINCH signal\n");
+    printw("Received SIGWINCH signal\n");
     refresh();
+}
+#endif
+
+void SetupResizeHandler() {
+    #ifdef _WIN32
+        // Windows-specific terminal resize handling
+        HandleResize();
+    #else
+        // Unix-like systems use SIGWINCH
+        std::signal(SIGWINCH, HandleResize);
+    #endif
 }
 
 void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int>> WindowLayoutC) {
@@ -295,7 +321,7 @@ void InitColors() {
 
 int main() {
     initscr();
-    std::signal(SIGWINCH, HandleResize);
+    SetupResizeHandler(); // Cross-platform resize handler
     cbreak();
     noecho();
     curs_set(0);
