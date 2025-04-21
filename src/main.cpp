@@ -276,6 +276,12 @@ void InitColors() {
 
 int main() {
     initscr();
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+    printw("Terminal size: %d rows, %d cols\n", rows, cols);
+    refresh();
+    getch();
+
     cbreak();
     noecho();
     curs_set(0);
