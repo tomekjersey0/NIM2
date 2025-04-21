@@ -196,7 +196,6 @@ void StartGame() {
         if (c == '-') {
             Game::UpdateSTD_UNIT(-1);
             SetTerminalSize(Windows);
-            Game::setJustResized(true);
         }
         
         Game::getPhysicalTerminalSize(cur_row, cur_col);
@@ -206,16 +205,17 @@ void StartGame() {
         }
 
         // Print memory usage
+        WINDOW* debugWindow = Windows[0].getWindow();
         long memUsage = getMemoryUsageKB();
         if (memUsage != -1) {
-            mvprintw(1, 1,"Memory Usage: %ld KB", memUsage);
+            mvwprintw(debugWindow, 1, 1,"Memory Usage: %ld KB", memUsage);
         } else {
-            mvprintw(2, 1, "Error retrieving memory usage");
+            mvwprintw(debugWindow, 1, 1, "Error retrieving memory usage");
         }
 
-        mvprintw(2, 1, "Ripples for window[0]: %d", Windows[0].getRippleCount());
+        mvwprintw(debugWindow, 2, 1, "Ripples for window[0]: %d", Windows[0].getRippleCount());
 
-        refresh();
+        wrefresh(debugWindow);
 
         // Add a small delay to prevent excessive CPU usage
         napms(10);
