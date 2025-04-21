@@ -34,7 +34,7 @@ void Animation::SetPositions(int _y, int _x) {
 
 void Animation::eraseRipple() {
     std::string textBlank(text.length(), ' ');
-    mvwprintw(win, y, x, textBlank.c_str());
+    mvwprintw(win, y, x, "%s", textBlank.c_str());
 }
 
 void Animation::restartRipple() {
@@ -53,7 +53,7 @@ void Animation::Animate() {
 
     if (elapsedSecondsFromLastCharacter >= delay && !done) {
         nowText += text[progress];
-        mvwprintw(win, y, x, nowText.c_str());
+        mvwprintw(win, y, x, "%s", nowText.c_str());
         startTime = std::chrono::system_clock::now();
         progress++;
         if (progress == text.length()) {
