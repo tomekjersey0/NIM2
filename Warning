@@ -1,4 +1,0 @@
-/data/data/com.termux/files/home/nim2/src/WindowClass.cpp:28:9: warning: delete called on 'Ripple' that is abstract but has non-virtual destructor [-Wdelete-abstract-non-virtual-dtor]
-   28 |         delete rip;
-      |         ^
-1 warning generated.

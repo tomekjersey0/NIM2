@@ -16,6 +16,7 @@ class Ripple
     public:
         Ripple(WindowClass * _parent);
         Ripple(RippleList * _parent);
+        virtual ~Ripple() = default;
         virtual void Update() = 0;
         virtual void SetX(int _x) {}
         virtual void SetY(int _y) {}
