@@ -10,7 +10,7 @@ RipplePrint::RipplePrint(WindowClass * _parent, int _y, int _x, std::string _tex
     win = parent->getWindow();
 }
 
-std::chrono::_V2::system_clock::time_point RipplePrint::getStartTime() {
+std::chrono::system_clock::time_point RipplePrint::getStartTime() {
     return startTime;
 }
 

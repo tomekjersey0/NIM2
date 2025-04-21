@@ -20,7 +20,7 @@ class RipplePrint : public Ripple, public Animation
 
     public:
         RipplePrint(WindowClass * _parent, int _y, int _x, std::string _text, double _interval = -1, COLOR _color = COLOR::NORMAL, double _delay = 0.05);
-        std::chrono::_V2::system_clock::time_point getStartTime();
+        std::chrono::system_clock::time_point getStartTime();
         int getX();
         int getY();
         std::string GetText() override;

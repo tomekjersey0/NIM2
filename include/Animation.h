@@ -16,7 +16,7 @@ class Animation
         int progress;
         bool done, looping;
         double delay, interval;
-        std::chrono::_V2::system_clock::time_point startTime, startAnimTime;
+        std::chrono::system_clock::time_point startTime, startAnimTime;
 
     public:
         Animation(int _y, int _x, std::string _text, double _interval, double _delay);
