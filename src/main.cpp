@@ -215,8 +215,6 @@ void StartGame() {
 
         mvwprintw(debugWindow, 2, 1, "Ripples for window[0]: %d", Windows[0].getRippleCount());
 
-        wrefresh(debugWindow);
-
         // Add a small delay to prevent excessive CPU usage
         napms(10);
     }
