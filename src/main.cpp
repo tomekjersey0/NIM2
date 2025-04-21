@@ -3,12 +3,21 @@
 #include "RippleList.h"
 #include "RippleItem.h"
 #include "Game.h"
+#include <csignal>
+#include <cstdio>
 
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
+volatile bool resizeRequested = false;
 
 void TimedErrorExit(std::string message, int countdownTime=3);
 void SetTerminalSize(std::vector<WindowClass>& Windows);
+
+void HandleResize(int sig) {
+    resizeRequested = true;
+    printw("Recieved SIGWINCH signal\n");
+    refresh();
+}
 
 void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int>> WindowLayoutC) {
     // Ensure row and col are within bounds
@@ -174,9 +183,12 @@ void StartGame() {
             gameOn = false;
         }
 
-        if (c == KEY_RESIZE) {
+        // Handle window resizing
+        if (resizeRequested || c == KEY_RESIZE) {
             SetTerminalSize(Windows);
             refresh();
+            gameOn = false; // Exit game loop on resize
+            resizeRequested = false;
         }
 
         // Handle key presses to update STD_UNIT and resize terminal
@@ -255,33 +267,35 @@ void InitColors() {
     start_color();
 
     if (!has_colors()) {
-        TimedErrorExit("Error: Colors not available. Closing. ");
+        echo();
+        printw("Terminal does not support colors.\n");
+        printw("Continuing without colors.\n");
+        printw("Press any key to continue...\n");
+        refresh();
+        getch();
+        noecho();
     }
-    if (!can_change_color()) {
-        TimedErrorExit("Error: Cannot change colors. Closing. ");
+    if (can_change_color()) {
+        // Custom color definitions for terminals that support it
+        init_color(COLOR_WHITE, 700, 700, 700);
     }
 
-    // Make sure ts matches the enum COLOR in enums.h
-    init_color(COLOR_WHITE, 700, 700, 700);
+    // Numbers here refer to the allocation of colors to their names / uses in enums.h
+    init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
     init_pair(3, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(4, COLOR_RED, COLOR_BLACK);
     init_pair(5, COLOR_GREEN, COLOR_BLACK);
-    init_pair(6, COLOR_BLUE, COLOR_BLACK);
+    init_pair(6, COLOR_BLUE, COLOR_BLACK);  
     init_pair(7, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(8, COLOR_CYAN, COLOR_BLACK);
-    init_pair(9, COLOR_YELLOW, COLOR_BLACK);    
+    init_pair(9, COLOR_YELLOW, COLOR_BLACK);
+
 }
 
 int main() {
     initscr();
-    int rows, cols;
-    getmaxyx(stdscr, rows, cols);
-    printw("Terminal size: %d rows, %d cols\n", rows, cols);
-    refresh();
-    getch();
-
+    std::signal(SIGWINCH, HandleResize);
     cbreak();
     noecho();
     curs_set(0);
