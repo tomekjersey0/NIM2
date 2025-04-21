@@ -252,6 +252,15 @@ void SetTerminalSize(std::vector<WindowClass>& Windows) {
 }
 
 void InitColors() {
+    start_color();
+
+    if (!has_colors()) {
+        TimedErrorExit("Error: Colors not available. Closing. ");
+    }
+    if (!can_change_color()) {
+        TimedErrorExit("Error: Cannot change colors. Closing. ");
+    }
+
     // Make sure ts matches the enum COLOR in enums.h
     init_color(COLOR_WHITE, 700, 700, 700);
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
@@ -267,21 +276,14 @@ void InitColors() {
 
 int main() {
     initscr();
-    start_color();
     cbreak();
     noecho();
     curs_set(0);
+    set_escdelay(0);
     keypad(stdscr, TRUE);
     nodelay(stdscr, TRUE);
     
     // Initialize colors
-    if (!has_colors()) {
-        TimedErrorExit("Error: Colors not available. Closing. ");
-    }
-    if (!can_change_color()) {
-        TimedErrorExit("Error: Cannot change colors. Closing. ");
-    }
-
     InitColors();
 
     // Input layout data based on the windows defined immediately later
