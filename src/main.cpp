@@ -279,7 +279,11 @@ int main() {
     cbreak();
     noecho();
     curs_set(0);
-    set_escdelay(0);
+    #ifdef NCURSES_VERSION
+        set_escdelay(0);
+    #else
+        // No need for this fix on Windows
+    #endif
     keypad(stdscr, TRUE);
     nodelay(stdscr, TRUE);
     
