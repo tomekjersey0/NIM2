@@ -4,8 +4,6 @@
 #include "RippleItem.h"
 #include "Game.h"
 #include <csignal>
-#include <cstdio>
-
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -16,34 +14,6 @@ volatile bool resizeRequested = false;
 
 void TimedErrorExit(std::string message, int countdownTime=3);
 void SetTerminalSize(std::vector<WindowClass>& Windows);
-
-#ifdef _WIN32
-void HandleResize() {
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi)) {
-        int cols = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-        int rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-        // Update terminal size or handle resizing logic here
-        resize_term(rows, cols);
-    }
-}
-#else
-void HandleResize(int sig) {
-    resizeRequested = true;
-    printw("Received SIGWINCH signal\n");
-    refresh();
-}
-#endif
-
-void SetupResizeHandler() {
-    #ifdef _WIN32
-        // Windows-specific terminal resize handling
-        HandleResize();
-    #else
-        // Unix-like systems use SIGWINCH
-        std::signal(SIGWINCH, HandleResize);
-    #endif
-}
 
 void UpdateSelected(int& selected, int row, int col, std::vector<std::vector<int>> WindowLayoutC) {
     // Ensure row and col are within bounds
@@ -140,7 +110,6 @@ void StartGame() {
     }
 
     while (gameOn) {
-
         // Update all windows
         for (int i = 0; i < Windows.size(); i++) {
             if (!Windows[i].IsShowing())
@@ -211,9 +180,9 @@ void StartGame() {
 
         // Handle window resizing
         if (resizeRequested || c == KEY_RESIZE) {
+            Game::UpdateSTD_UNIT(0);
             SetTerminalSize(Windows);
             refresh();
-            gameOn = false; // Exit game loop on resize
             resizeRequested = false;
         }
 
@@ -228,7 +197,19 @@ void StartGame() {
             SetTerminalSize(Windows);
             refresh();
         }
+        
+        Game::getPhysicalTerminalSize(cur_row, cur_col);
+        mvprintw(1, 1, "Terminal size: %d rows, %d cols\n", cur_row, cur_col);
+        mvprintw(2, 1, "Terminal size: %d rows, %d cols\n", Game::getTERMINAL_HEIGHT(), Game::getTERMINAL_WIDTH());
+        
+        if (cur_row != Game::getTERMINAL_HEIGHT() || cur_col != Game::getTERMINAL_WIDTH()) {
+            Game::resetStoredTerminalSize();
+            resizeRequested = true;
+        }
 
+        refresh();
+
+        // Add a small delay to prevent excessive CPU usage
         napms(10);
     }
 }
@@ -321,7 +302,6 @@ void InitColors() {
 
 int main() {
     initscr();
-    SetupResizeHandler(); // Cross-platform resize handler
     cbreak();
     noecho();
     curs_set(0);
