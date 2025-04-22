@@ -41,7 +41,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "CMake: Build" // Ensure the project is built before debugging
+            "preLaunchTask": "Clean and Build" // Ensure the project is built before debugging
         }
     ]
 }

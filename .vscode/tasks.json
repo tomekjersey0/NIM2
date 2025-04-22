@@ -13,6 +13,20 @@
                 "isDefault": true
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Clean and Build",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c", // Use Windows command shell
+                "del /q build\\NIM2.exe && cmake --build build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
         }
     ]
 }
