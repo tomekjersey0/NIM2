@@ -1,6 +1,6 @@
 #pragma once
-#ifndef WINDOWCLASS_H
-#define WINDOWCLASS_H
+#ifndef WINDOW_CLASS_H
+#define WINDOW_CLASS_H
 
 #include <curses.h>
 #include <vector>

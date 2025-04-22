@@ -14,12 +14,30 @@ std::chrono::system_clock::time_point RipplePrint::getStartTime() {
     return startTime;
 }
 
-int RipplePrint::getX() {
+int RipplePrint::GetX() const {
     return x;
 }
 
-int RipplePrint::getY() {
+int RipplePrint::GetY() const {
     return y;
+}
+
+void RipplePrint::SetX(int _x) {
+    x = _x;
+}
+
+void RipplePrint::SetY(int _y) {
+    y = _y;
+}
+
+void RipplePrint::MoveRippleTo(int _x, int _y) {
+    Animation::eraseRipple();
+    x = _x;
+    y = _y;
+}
+
+void RipplePrint::MoveRipple(int dx, int dy) {
+    MoveRippleTo(x + dx, y + dy);
 }
 
 std::string RipplePrint::GetText() {

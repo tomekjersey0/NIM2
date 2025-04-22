@@ -6,13 +6,14 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "--build", "build"
+                "--build",
+                "build"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": []
-        }
+        },
     ]
 }

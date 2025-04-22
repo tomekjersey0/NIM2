@@ -3,9 +3,20 @@
 #include "RippleList.h"
 #include "RippleItem.h"
 #include "Game.h"
+#include "memoryTrack.h"
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <sys/ioctl.h>
+    #include <unistd.h>
+    #include <cstdio>
+    #include <csignal>
+#endif
+
 
 std::vector<WindowClass> Windows;
 std::vector<std::vector<int>> WindowLayout;
+volatile bool resizeRequested = false;
 
 void TimedErrorExit(std::string message, int countdownTime=3);
 void SetTerminalSize(std::vector<WindowClass>& Windows);
@@ -105,7 +116,6 @@ void StartGame() {
     }
 
     while (gameOn) {
-
         // Update all windows
         for (int i = 0; i < Windows.size(); i++) {
             if (!Windows[i].IsShowing())
@@ -174,23 +184,38 @@ void StartGame() {
             gameOn = false;
         }
 
-        if (c == KEY_RESIZE) {
+        // Handle window resizing
+        if (resizeRequested || c == KEY_RESIZE) {
+            Game::UpdateSTD_UNIT(0);
             SetTerminalSize(Windows);
-            refresh();
+            resizeRequested = false;
         }
-
         // Handle key presses to update STD_UNIT and resize terminal
         if (c == '+') {
             Game::UpdateSTD_UNIT(1);
             SetTerminalSize(Windows);
-            refresh();
         }
         if (c == '-') {
             Game::UpdateSTD_UNIT(-1);
             SetTerminalSize(Windows);
-            refresh();
+        }
+        
+        Game::getPhysicalTerminalSize(cur_row, cur_col);
+        if (cur_row != Game::getTERMINAL_HEIGHT() || cur_col != Game::getTERMINAL_WIDTH()) {
+            Game::resetStoredTerminalSize();
+            resizeRequested = true;
         }
 
+        // Print memory usage
+        WINDOW* debugWindow = Windows[0].getWindow();
+        long memUsage = getMemoryUsageKB();
+        if (memUsage != -1) {
+            mvwprintw(debugWindow, 1, 1,"Memory Usage: %ld KB", memUsage);
+        } else {
+            mvwprintw(debugWindow, 1, 1, "Error retrieving memory usage");
+        }
+
+        // Add a small delay to prevent excessive CPU usage
         napms(10);
     }
 }
@@ -249,29 +274,48 @@ void SetTerminalSize(std::vector<WindowClass>& Windows) {
         }
     }
     resize_term(termHeight, termWidth);
+
+    // Resizes the physical terminal to the size of the windows
+    // Doesn't work at all
+    #ifndef _WIN32
+        struct winsize ws;
+        ws.ws_row = termHeight;
+        ws.ws_col = termWidth;
+        ws.ws_xpixel = 0;
+        ws.ws_ypixel = 0;
+        ioctl(STDOUT_FILENO, TIOCSWINSZ, &ws);
+        printf("\e[8;%d;%dt", termHeight, termWidth);
+    #endif
 }
 
 void InitColors() {
     start_color();
 
     if (!has_colors()) {
-        TimedErrorExit("Error: Colors not available. Closing. ");
+        echo();
+        printw("Terminal does not support colors.\n");
+        printw("Continuing without colors.\n");
+        printw("Press any key to continue...\n");
+        refresh();
+        getch();
+        noecho();
     }
-    if (!can_change_color()) {
-        TimedErrorExit("Error: Cannot change colors. Closing. ");
+    if (can_change_color()) {
+        // Custom color definitions for terminals that support it
+        init_color(COLOR_WHITE, 700, 700, 700);
     }
 
-    // Make sure ts matches the enum COLOR in enums.h
-    init_color(COLOR_WHITE, 700, 700, 700);
+    // Numbers here refer to the allocation of colors to their names / uses in enums.h
+    init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(2, COLOR_CYAN, COLOR_BLACK);
     init_pair(3, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(1, COLOR_WHITE, COLOR_BLACK);
     init_pair(4, COLOR_RED, COLOR_BLACK);
     init_pair(5, COLOR_GREEN, COLOR_BLACK);
-    init_pair(6, COLOR_BLUE, COLOR_BLACK);
+    init_pair(6, COLOR_BLUE, COLOR_BLACK);  
     init_pair(7, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(8, COLOR_CYAN, COLOR_BLACK);
-    init_pair(9, COLOR_YELLOW, COLOR_BLACK);    
+    init_pair(9, COLOR_YELLOW, COLOR_BLACK);
+
 }
 
 int main() {
