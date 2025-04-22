@@ -1,6 +1,6 @@
 #pragma once
-#ifndef RIPPLELIST_H
-#define RIPPLELIST_H
+#ifndef RIPPLE_LIST_H
+#define RIPPLE_LIST_H
 
 #include <iostream>
 #include <vector>

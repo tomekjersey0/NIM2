@@ -18,8 +18,12 @@ class Ripple
         Ripple(RippleList * _parent);
         virtual ~Ripple() = default;
         virtual void Update() = 0;
-        virtual void SetX(int _x) {}
-        virtual void SetY(int _y) {}
+        virtual void SetX(int _x) {};
+        virtual void SetY(int _y) {};
+        virtual int GetX() const { return 0; };
+        virtual int GetY() const { return 0; };
+        virtual void MoveRipple(int dx, int dy) {};
+        virtual void MoveRippleTo(int _x, int _y) {};
         virtual std::string GetText() {return "";};
 };
 

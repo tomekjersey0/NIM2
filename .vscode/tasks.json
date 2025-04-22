@@ -6,7 +6,8 @@
             "type": "shell",
             "command": "cmake",
             "args": [
-                "--build", "build"
+                "--build",
+                "build"
             ],
             "group": {
                 "kind": "build",
@@ -14,33 +15,5 @@
             },
             "problemMatcher": []
         },
-        {
-            "label": "Clean and Build (Windows)",
-            "type": "shell",
-            "command": "cmd",
-            "args": [
-                "/c", // Use Windows command shell
-                "del /q build\\NIM2.exe && cmake --build build"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Clean and Build (Linux)",
-            "type": "shell",
-            "command": "sh",
-            "args": [
-                "-c",
-                "rm -f build/NIM2 && cmake --build build"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": []
-        }
     ]
 }

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef RIPPLEITEM_H
-#define RIPPLEITEM_H
+#ifndef RIPPLE_ITEM_H
+#define RIPPLE_ITEM_H
 
 #include "Ripple.h"
 #include "RippleList.h"

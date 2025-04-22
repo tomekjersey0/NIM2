@@ -213,8 +213,6 @@ void StartGame() {
             mvwprintw(debugWindow, 1, 1, "Error retrieving memory usage");
         }
 
-        mvwprintw(debugWindow, 2, 1, "Ripples for window[0]: %d", Windows[0].getRippleCount());
-
         // Add a small delay to prevent excessive CPU usage
         napms(10);
     }

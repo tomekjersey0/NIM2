@@ -1,3 +1,7 @@
+#pragma once
+#ifndef GAME_H
+#define GAME_H
+
 #include <iostream>
 #include <vector>
 
@@ -22,3 +26,5 @@ class Game
         static void getPhysicalTerminalSize(int& rows, int& cols);
         static void resetStoredTerminalSize() {getPhysicalTerminalSize(TERMINAL_HEIGHT, TERMINAL_WIDTH);}
 };
+
+#endif
