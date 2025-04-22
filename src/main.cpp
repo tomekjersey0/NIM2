@@ -185,7 +185,6 @@ void StartGame() {
         if (resizeRequested || c == KEY_RESIZE) {
             Game::UpdateSTD_UNIT(0);
             SetTerminalSize(Windows);
-            refresh();
             resizeRequested = false;
         }
         // Handle key presses to update STD_UNIT and resize terminal
