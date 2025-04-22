@@ -1,4 +1,16 @@
 #include "memoryTrack.h"
+#ifdef _WIN32
+#include <windows.h>
+#include <psapi.h>
+
+long getMemoryUsageKB() {
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
+        return static_cast<long>(pmc.WorkingSetSize / 1024);
+    }
+    return -1;
+}
+#else
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -18,3 +30,4 @@ long getMemoryUsageKB() {
     }
     return -1;
 }
+#endif
