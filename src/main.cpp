@@ -4,10 +4,13 @@
 #include "RippleItem.h"
 #include "Game.h"
 #include "memoryTrack.h"
-#include <csignal>
-#include <chrono>
 #ifdef _WIN32
-#include <windows.h>
+    #include <windows.h>
+#else
+    #include <sys/ioctl.h>
+    #include <unistd.h>
+    #include <cstdio>
+    #include <csignal>
 #endif
 
 
@@ -271,6 +274,18 @@ void SetTerminalSize(std::vector<WindowClass>& Windows) {
         }
     }
     resize_term(termHeight, termWidth);
+
+    // Resizes the physical terminal to the size of the windows
+    // Doesn't work at all
+    #ifndef _WIN32
+        struct winsize ws;
+        ws.ws_row = termHeight;
+        ws.ws_col = termWidth;
+        ws.ws_xpixel = 0;
+        ws.ws_ypixel = 0;
+        ioctl(STDOUT_FILENO, TIOCSWINSZ, &ws);
+        printf("\e[8;%d;%dt", termHeight, termWidth);
+    #endif
 }
 
 void InitColors() {
