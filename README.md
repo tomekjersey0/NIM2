@@ -103,10 +103,21 @@ Don't use vcpkg as it's seems to have trouble on linux.
 #### Windows
 The best installment of PDCurses using MinGW is the `unofficial-pdcurses package` which can be installed with:
 ```bash
-vcpkg install unofficial-pdcurses:x64-mingw-dynamic
+vcpkg install pdcurses:x64-mingw-dynamic
 ```
+To make this work, for some reason you also need to install:
+```bash
+vcpkg install pdcurses
+```
+Which downloads the MSVC build. Without it however the mingw one wont be found for some reason!
 For a dynamic build.
 It has to be done this way as official MSVC packages do not support MinGW build systems.
+
+**Make sure to the run** 
+```bash
+vcpkg integrate install
+```
+So that cmake will see the packages
 
 <hr>
 
@@ -121,7 +132,10 @@ Also, you don't have to specify `-G "MinGW Makefiles"` if you set it as your def
 No system variables build:
 ```bash
 cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-dynamic
+```
+If you're having trouble with this, it could be likely that a pre-exisitng build folder is present in your `nim2` directory, directly interfering with the generation of build files process. Sometimes removing the `build` directory is a good idea
 
+```bash
 cmake --build build
 ```
 Minimal build:
@@ -133,7 +147,8 @@ cmake -S . -B build
 No system variables build
 ```bash
 cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-mingw-static
-
+```
+```bash
 cmake --build build --config Release
 ```
 
